@@ -1,10 +1,10 @@
-addpath(genpath('/home/bhigy/dev/matlab'));
+addpath(genpath('/home/bhigy/dev/tactile_objrec_mat'));
 
 %% Loading all data
 dataset = VisualDataset('/home/bhigy/data/venerdi26');
 
 %% Configuration
-config = 1;
+config = 6;
 
 switch config
     case 1
@@ -64,42 +64,26 @@ pourcentage = mean(arrayfun(@(x) most_freq(x),Y) == data_infos');
 retrieved_by_inst = arrayfun(@(x) most_freq(mode(Y(data_infos == x))),1:k);
 
 %% ploting the clusters
-% Dimension reduction
+% Dimension reduction - SVD
 [U, S, V] = svd(X.data);
-X_2D = U*S;
+result = U*S;
 
 % Drawing
-figure;
-hold all;
-plot_by = 2;
+svd_points = Points(result(:,1), result(:,2));
+
+plot_by = 3;
 switch plot_by
     case 1 %clusters
-        nb_colors = k;
-        grouping = 'cluster';
+        svd_points.draw(Y);
     case 2 %instances
-        nb_colors = length(X.get_ref_infos(VisualDataset.INSTANCE));
-        grouping = 'instance';
+        svd_points.draw(X.get_data_infos(VisualDataset.INSTANCE));
     case 3 %labels
-        nb_colors = length(X.get_ref_infos(VisualDataset.LABEL));
-        grouping = 'label';
+        svd_points.draw(X.get_data_infos(VisualDataset.LABEL));
 end
 
-colors = hsv(nb_colors);
-legends = {};
-for i = 1:nb_colors
-    switch plot_by
-        case 1
-            ind = Y == i;
-        case 2
-            ind = (X.get_data_infos(VisualDataset.INSTANCE) == i);
-        case 3
-            ind = (X.get_data_infos(VisualDataset.LABEL) == i);
-    end
-    lines = X_2D(ind, :);
-    if ~isempty(lines)
-        points = plot(lines(:,1), lines(:,2), 'MarkerEdgeColor', colors(i,:), 'Marker', '.', 'LineStyle', 'none');
-        legends(end + 1) = {strcat(grouping, ' ', int2str(i))};
-    end
-end
-legend(legends);
-hold off
+% Dimension reduction - t_NSE
+addpath(genpath('/home/bhigy/dev/t_SNE'));
+mappedX = tsne(dataset.data, []);
+tsne_points = Points(mappedX(:,1), mappedX(:,2));
+tsne_points.draw(dataset.get_data_infos(VisualDataset.LABEL));
+% tsne_points.draw(Y);
