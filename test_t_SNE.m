@@ -1,0 +1,18 @@
+addpath(genpath('/home/bhigy/dev/t_SNE'));
+mappedX = tsne(dataset.data, []);
+X1 = mappedX(X.get_data_infos(VisualDataset.LABEL) == 1, :);
+X2 = mappedX(X.get_data_infos(VisualDataset.LABEL) == 2, :);
+X3 = mappedX(X.get_data_infos(VisualDataset.LABEL) == 3, :);
+X4 = mappedX(X.get_data_infos(VisualDataset.LABEL) == 4, :);
+X5 = mappedX(X.get_data_infos(VisualDataset.LABEL) == 5, :);
+X6 = mappedX(X.get_data_infos(VisualDataset.LABEL) == 6, :);
+X7 = mappedX(X.get_data_infos(VisualDataset.LABEL) == 7, :);
+hold all;
+plot(X1(:,1), X1(:,2), '.');
+plot(X2(:,1), X2(:,2), '.');
+plot(X3(:,1), X3(:,2), '.');
+plot(X4(:,1), X4(:,2), '.');
+plot(X5(:,1), X5(:,2), '.');
+plot(X6(:,1), X6(:,2), '.');
+plot(X7(:,1), X7(:,2), '.');
+hold off;
