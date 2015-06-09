@@ -8,15 +8,19 @@
 
 function [clusters, categories] = kmeans(data, k)
 
+%% Initialization
 % Computing the number of samples and the samples size
 [n_samples, sample_size] = size(data);
 
-% initialisation of the clusters centers
-clusters = rand(k, sample_size)*255;
-difference = 1;
+% Initialisation of the clusters centers
+clusters = data(ceil(rand(1,7)*n_samples),:);
 
+difference = 1;
 distances = zeros(k, 1);
 categories = zeros(n_samples, 1);
+
+%% Recomputing cluster centers as long as they change
+
 while difference == 1
     % Re-computing the cluster's centers
     new_clusters = zeros(k, sample_size);

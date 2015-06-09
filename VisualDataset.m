@@ -1,19 +1,18 @@
-classdef VisualDataset < matlab.mixin.Copyable
+classdef VisualDataset < Dataset
+    % Visual dataset
+    
     properties (Constant)
         LABEL = 1
         INSTANCE = 2
         FEATURE = 3
     end
-    properties
-        data
-    end
-    properties (Access = private)
+    properties %(Access = private)
         ref_labels
         ref_instances
         ref_features
-        data_labels
-        data_instances
-        data_features
+        labels
+        instances
+        features
     end
     
     methods
@@ -25,10 +24,10 @@ classdef VisualDataset < matlab.mixin.Copyable
             d = Directory(path, folder_name);
             sd = d.get_sub_dirs();
 
-            obj.data = [];
-            obj.data_labels = [];
-            obj.data_instances = [];
-            obj.data_features = [];
+            obj = obj@Dataset([]);
+            obj.labels = [];
+            obj.instances = [];
+            obj.features = [];
             obj.ref_labels = {};
             obj.ref_instances = {};
             obj.ref_features = {};
@@ -46,9 +45,9 @@ classdef VisualDataset < matlab.mixin.Copyable
                         nb_features = nb_features + 1;
                         obj.ref_features(nb_features) = {files(k).name};
                         obj.data = [obj.data; load(files(k).full_path)'];
-                        obj.data_labels(end + 1) = i;
-                        obj.data_instances(end + 1) = nb_instances;
-                        obj.data_features(end + 1) = nb_features;
+                        obj.labels(end + 1, 1) = i;
+                        obj.instances(end + 1, 1) = nb_instances;
+                        obj.features(end + 1, 1) = nb_features;
                     end
                 end
             end
@@ -68,24 +67,39 @@ classdef VisualDataset < matlab.mixin.Copyable
         function data_infos = get_data_infos(obj, type)
             switch type
                 case VisualDataset.LABEL
-                    data_infos = obj.data_labels;
+                    data_infos = obj.labels;
                 case VisualDataset.INSTANCE
-                    data_infos = obj.data_instances;
+                    data_infos = obj.instances;
                 case VisualDataset.FEATURE
-                    data_infos = obj.data_features;
+                    data_infos = obj.features;
             end
         end
         
-        function filter(obj, by, allowed_values)
-            ref_values = obj.get_ref_infos(by);
-            data_values = obj.get_data_infos(by);
+        function is_verified = check_condition(obj, column, allowed_values)
+            ref_values = obj.get_ref_infos(column);
+            data_values = obj.get_data_infos(column);
             
             ids = [];
             for i = 1:length(allowed_values)
                 ids = [ids find(strcmp(allowed_values(i), ref_values))];
             end
-            lines = ismember(data_values, ids);
-            obj.data = obj.data(lines,:);
+            is_verified = ismember(data_values, ids);
+        end
+        
+        function subset = get_subset(obj, criteria)
+            subset             = obj.get_subset@Dataset(criteria);
+            subset.labels      = subset.labels(criteria);
+            subset.instances   = subset.instances(criteria);
+            subset.features    = subset.features(criteria);
+        end
+        
+        function set = merge_subsets(set1, set2)
+            set = set1.merge_subsets@Dataset(set2);
+            if ~isempty(set2)
+                set.labels     = [set.labels; set2.labels];
+                set.instances  = [set.instances; set2.instances];
+                set.features   = [set.features; set2.features];
+            end
         end
     end
 end

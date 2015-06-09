@@ -10,13 +10,12 @@ classdef Points
             obj.Y = Y;
         end
         
-        function draw(obj, grouping)
+        function draw(obj, grouping, labels)
             if isempty(grouping)
                 grouping = zeroes(length(obj.X), 1);
             end
             
             grps = unique(grouping);
-%             colors = hsv(length(grps));
             colors = linspecer(length(grps));
             figure;
             hold all;
@@ -24,7 +23,11 @@ classdef Points
                 plot(obj.X(grouping == grps(i)), obj.Y(grouping == grps(i)), 'MarkerEdgeColor', colors(i,:), 'Marker', '.', 'LineStyle', 'none');
             end
             if length(grps) > 1
-                legend(arrayfun(@(x) {int2str(x)}, grps));
+                if isempty(labels)
+                    legend(arrayfun(@(x) {int2str(x)}, grps));
+                else
+                    legend(labels);
+                end
             end
             hold off;
         end
