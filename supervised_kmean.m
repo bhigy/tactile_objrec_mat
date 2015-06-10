@@ -1,35 +1,37 @@
 addpath(genpath('/home/bhigy/dev/bh_tsne'));
+addpath(genpath('/home/bhigy/dev/objrecpipe_mat'));
 run('/home/bhigy/dev/vlfeat-0.9.20/toolbox/vl_setup')
 
 [test, training] = X.split_cat(50, Dataset.SPLITMODE_ABS, X.instances);
 [training, validation] = training.split_cat(25, Dataset.SPLITMODE_PCT, training.instances);
 
 k_values = 2:5:57;
-nb_trials = 10;
-Ycomp_train = zeros(size(training.data,1),length(k_values));
-Ycomp_valid = zeros(size(validation.data,1),length(k_values));
+nb_trials = 1;
+clus_membership_train = zeros(size(training.data,1));
+Ycomp_valid = zeros(size(validation.data,1));
 clusters = cell(length(k_values), 1);
 clusters_labels = cell(length(k_values), 1);
 score = zeros(length(k_values), nb_trials);
 clustering_by = VisualDataset.INSTANCE;
+Ytrain = training.get_data_infos(clustering_by);
+Yvalid = validation.get_data_infos(clustering_by);
 
 i = 1;
 for k = k_values
     for trial = 1:nb_trials
         % computing clusters on the training set
-        [C, Ycomp_train(:,i)] = vl_kmeans(training.data', k);
+        [C, clus_membership_train(:,i)] = vl_kmeans(training.data', k);
         clusters(i) = {C};
-        Ytrain = training.get_data_infos(clustering_by);
-        most_freq = arrayfun(@(x) mode(Ytrain(Ycomp_train(:,i) == x)),1:k);
+        most_freq = arrayfun(@(x) mode(Ytrain(clus_membership_train(:,i) == x)),1:k);
         clusters_labels(i) = {most_freq};
 
-        Yvalid = validation.get_data_infos(clustering_by);
         for j = 1:size(validation.data, 1)
             [~, c] = min(vl_alldist(validation.data(j,:)', C));
-            Ycomp_valid(j,i) = c;
-            score(i, trial) = score(i, trial) + (Yvalid(j) == most_freq(c));
+            Ycomp_valid(j,1) = most_freq(c);
         end
-        score(i, trial) = score(i, trial) / size(validation.data, 1);
+        confus = compute_confusion_matrix(Yvalid, Ycomp_valid);
+        score(i, trial) = mean(arrayfun(@(x) confus(x,x)/sum(confus(x,:)), 1:size(confus, 1)));
+        %score(i, trial) = score(i, trial) / size(validation.data, 1);
     end
     i = i + 1;
 end

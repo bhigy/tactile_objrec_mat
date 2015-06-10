@@ -3,13 +3,17 @@ run('/home/bhigy/dev/vlfeat-0.9.20/toolbox/vl_setup')
 
 %% Clustering
 k = length(unique(Y));
-[clusters, Ycomp] = vl_kmeans(X.data', k);
+[clusters, clus_membership] = vl_kmeans(X.data', k);
+
 
 %% Computing some measures
 % for each cluster we compute the most frequent label
 most_freq = arrayfun(@(x) mode(Y(Ycomp == x)),1:k);
+% we can then attach a computed label to each element
+Ycomp = arrayfun(@(x) most_freq(x),clus_membership);
 % and then we compare to the actual label
-pourcentage = mean(arrayfun(@(x) most_freq(x),Ycomp) == Y);
+confus = compute_confusion_matrix(Y, Ycomp);
+score = mean(arrayfun(@(x) confus(x,x)/sum(confus(x,:)), 1:size(confus, 1)));
 % computing the most frequent "retrieved label" by instance
 retrieved_by_inst = arrayfun(@(x) most_freq(mode(Ycomp(Y == x))),1:k);
 
