@@ -37,11 +37,11 @@ classdef Dataset < matlab.mixin.Copyable
             obj.data = data;
         end
         
-        function downsample(obj, factor)
+        function subset = downsample(obj, factor)
             % Downsamples the dataset taking one line out of 'factor'
             selection = zeros(size(obj.data, 1), 1);
             selection(1:factor:end) = 1;
-            obj.data = obj.get_subset(selection);
+            subset = obj.get_subset(logical(selection));
         end
         
         function points = get_2D_projection(obj, proj_meth)
@@ -63,9 +63,9 @@ classdef Dataset < matlab.mixin.Copyable
         
         function [set1, set2] = split(obj, split_value, mode)
             % Split the data based on the split_value and the split mode
+            total_size = size(obj.data, 1);
             switch mode
                 case Dataset.SPLITMODE_PCT
-                    total_size = size(obj.data, 1);
                     size1 = round(total_size * split_value / 100);
                 case Dataset.SPLITMODE_ABS
                     size1 = split_value;

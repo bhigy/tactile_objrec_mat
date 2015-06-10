@@ -4,7 +4,7 @@ addpath(genpath('/home/bhigy/dev/tactile_objrec_mat'));
 dataset = VisualDataset('/home/bhigy/data/venerdi26');
 
 %% Configuration
-config = 1;
+config = 6;
 
 switch config
     case 1

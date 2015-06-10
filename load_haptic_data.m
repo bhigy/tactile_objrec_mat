@@ -12,7 +12,7 @@ labels(1) = [];
 haptic_filename = '/home/bhigy/data/experiments/20150527_1000/left_arm/data.log';
 haptic_data = Datadump(haptic_filename);
 % Down-sampling
-haptic_data.downsample(10);
+haptic_data = haptic_data.downsample(10);
 haptic_data.filter(sequences);
 haptic_data.data = haptic_data.data(:,8:16);
 X = haptic_data;

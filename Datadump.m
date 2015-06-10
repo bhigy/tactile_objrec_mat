@@ -5,9 +5,10 @@ classdef Datadump < Dataset
     
     methods 
         function obj = Datadump(path)
-            obj.data = load(path);
-            obj.timestamps = obj.data(:,2);
-            obj.data = obj.data(:,3:end);
+            obj             = obj@Dataset([]);
+            obj.data        = load(path);
+            obj.timestamps  = obj.data(:,2);
+            obj.data        = obj.data(:,3:end);
         end
         
         function obj = filter(obj, sequences)
