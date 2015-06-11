@@ -31,17 +31,38 @@ classdef Dataset < matlab.mixin.Copyable
         end
     end
     
-    %% Methods
+    methods (Static, Access = protected)
+        function selection = split_selection(size, split_value, mode)
+            % Select elements from a set of size 'size', based on
+            % split_value and mode
+            switch mode
+                case Dataset.SPLITMODE_PCT
+                    size_sub = round(size * split_value / 100);
+                case Dataset.SPLITMODE_ABS
+                    size_sub = split_value;
+            end
+            selection = Dataset.random_selection(size_sub, size);
+        end
+    end
+    
+    %% Public methods
     methods
         function obj = Dataset(data)
+             if ~exist('data', 'var')
+                 data = [];
+             end
             obj.data = data;
+        end
+        
+        function new_obj = new(obj)
+            new_obj = eval(class(obj));
         end
         
         function subset = downsample(obj, factor)
             % Downsamples the dataset taking one line out of 'factor'
             selection = zeros(size(obj.data, 1), 1);
             selection(1:factor:end) = 1;
-            subset = obj.get_subset(logical(selection));
+            subset = obj.get_subset_from_crit(logical(selection));
         end
         
         function points = get_2D_projection(obj, proj_meth)
@@ -56,26 +77,17 @@ classdef Dataset < matlab.mixin.Copyable
             end
         end
         
-        function subset = get_subset(obj, criteria)
-            subset      = obj.copy();
-            subset.data = subset.data(criteria,:);
+        function subset = get_subset(obj, arg)
+            switch class(arg)
+                case 'logical'
+                    subset = obj.get_subset_from_crit(arg);
+                case 'double'
+                    subset = obj.get_subset_from_linno(arg);
+                otherwise
+                    error('Invalid argument');
+            end
         end
         
-        function [set1, set2] = split(obj, split_value, mode)
-            % Split the data based on the split_value and the split mode
-            total_size = size(obj.data, 1);
-            switch mode
-                case Dataset.SPLITMODE_PCT
-                    size1 = round(total_size * split_value / 100);
-                case Dataset.SPLITMODE_ABS
-                    size1 = split_value;
-            end
-            picked = Dataset.random_selection(size1, total_size);
-            set1 = obj.get_subset(picked);
-            set2 = obj.get_subset(~picked);
-        end
-
-
         function set = merge_subsets(set1, set2)
             % Merge 2 subsets
             set = set1.copy();
@@ -84,21 +96,53 @@ classdef Dataset < matlab.mixin.Copyable
             end
         end
         
-        function [set1, set2] = split_cat(obj, split_value, mode, grouping)
+%         function [set1, set2] = split(obj, split_value, mode)
+%             % Split the data based on the split_value and the split mode
+%             total_size = size(obj.data, 1);
+%             switch mode
+%                 case Dataset.SPLITMODE_PCT
+%                     size1 = round(total_size * split_value / 100);
+%                 case Dataset.SPLITMODE_ABS
+%                     size1 = split_value;
+%             end
+%             picked = Dataset.random_selection(size1, total_size);
+%             set1 = obj.get_subset(picked);
+%             set2 = obj.get_subset(~picked);
+%         end
+        
+        function [set1, set2] = split(obj, split_value, mode, grouping)
             % Split the data of each category (based on 'grouping') 
             % depending on the 'split_value' and the split 'mode'
             if isempty(grouping)
-                grouping = zeros(size(obj.data, 1), 1);
+                selection = Dataset.split_selection(size(obj.data, 1), split_value, mode);
+                set1 = obj.data(selection,:);
+                set2 = obj.data(~selection,:);
+            else
+                categories = unique(grouping);
+                indices1 = [];
+                indices2 = [];
+                for i = 1:length(categories)
+                    indices = find(grouping == categories(i));
+                    selection = Dataset.split_selection(length(indices), split_value, mode);
+                    indices1 = [indices1; indices(selection)];
+                    indices2 = [indices2; indices(~selection)];
+                end
+                set1 = obj.get_subset_from_linno(indices1);
+                set2 = obj.get_subset_from_linno(indices2);
             end
-            categories = unique(grouping);
-            set1 = [];
-            set2 = [];
-            for i = 1:length(categories)
-                subset = obj.get_subset(grouping == categories(i));
-                [split1, split2] = subset.split(split_value, mode);
-                set1 = split1.merge_subsets(set1);
-                set2 = split2.merge_subsets(set2);
-            end
+        end
+    end
+    
+    %% Protected methods
+    methods (Access = protected)
+        function subset = get_subset_from_crit(obj, criteria)
+            subset      = obj.new();
+            subset.data = obj.data(criteria,:);
+        end
+        
+        function subset = get_subset_from_linno(obj, linno)
+            subset      = obj.new();
+            subset.data = obj.data(linno,:);
         end
     end
 end

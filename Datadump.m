@@ -1,14 +1,22 @@
 classdef Datadump < Dataset
+    % Datadump
+    
+    %% Prperties
     properties
         timestamps
     end
     
+    %% Public methods
     methods 
         function obj = Datadump(path)
-            obj             = obj@Dataset([]);
-            obj.data        = load(path);
-            obj.timestamps  = obj.data(:,2);
-            obj.data        = obj.data(:,3:end);
+            obj = obj@Dataset();
+            if exist('path', 'var') && ~isempty(path)
+                obj.data        = load(path);
+                obj.timestamps  = obj.data(:,2);
+                obj.data        = obj.data(:,3:end);
+            else
+                obj.timestamps = [];
+            end
         end
         
         function obj = filter(obj, sequences)
@@ -34,17 +42,25 @@ classdef Datadump < Dataset
             obj.data(i_data:end,:) = [];
             obj.timestamps(i_data:end) = [];
         end
-        
-        function subset = get_subset(obj, criteria)
-            subset              = obj.get_subset@Dataset(criteria);
-            subset.timestamps   = subset.timestamps(criteria);
-        end
 
         function set = merge_subsets(set1, set2)
             set = set1.merge_subsets@Dataset(set2);
             if ~isempty(set2)
                 set.timestamps = [set.timestamps; set2.timestamps];
             end
+        end
+    end
+    
+    %% Protected methods
+    methods (Access = protected)
+        function subset = get_subset_from_crit(obj, criteria)
+            subset              = obj.get_subset_from_crit@Dataset(criteria);
+            subset.timestamps   = obj.timestamps(criteria);
+        end
+
+        function subset = get_subset_from_linno(obj, linno)
+            subset              = obj.get_subset_from_linno@Dataset(linno);
+            subset.timestamps   = obj.timestamps(linno);
         end
     end
 end

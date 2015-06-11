@@ -1,6 +1,7 @@
 classdef VisualDataset < Dataset
     % Visual dataset
     
+    %% Properties
     properties (Constant)
         LABEL = 1
         INSTANCE = 2
@@ -15,8 +16,30 @@ classdef VisualDataset < Dataset
         features
     end
     
+    %% Methods
     methods
         function obj = VisualDataset(path)
+            % Constructor
+            
+            % Initialization
+            obj = obj@Dataset();
+            obj.labels = [];
+            obj.instances = [];
+            obj.features = [];
+            obj.ref_labels = {};
+            obj.ref_instances = {};
+            obj.ref_features = {};
+            
+            if exist('path', 'var')
+                obj.load(path);
+            end
+        end
+        
+        function load(obj, path)
+            if ~exist('path', 'var') || isempty(path)
+                error('Please specify a path');
+            end
+            
             pos = strfind(path, '/');
             pos = pos(end);
             folder_name = path(pos + 1:end);
@@ -24,15 +47,9 @@ classdef VisualDataset < Dataset
             d = Directory(path, folder_name);
             sd = d.get_sub_dirs();
 
-            obj = obj@Dataset([]);
-            obj.labels = [];
-            obj.instances = [];
-            obj.features = [];
-            obj.ref_labels = {};
-            obj.ref_instances = {};
-            obj.ref_features = {};
-            nb_instances = 0;
-            nb_features = 0;
+            nb_labels_ini = length(obj.labels);
+            nb_instances = length(obj.instances);
+            nb_features = length(obj.features);
             
             for i = 1:length(sd)
                 obj.ref_labels(i) = {sd(i).name};
@@ -45,7 +62,7 @@ classdef VisualDataset < Dataset
                         nb_features = nb_features + 1;
                         obj.ref_features(nb_features) = {files(k).name};
                         obj.data = [obj.data; load(files(k).full_path)'];
-                        obj.labels(end + 1, 1) = i;
+                        obj.labels(end + 1, 1) = nb_labels_ini + i;
                         obj.instances(end + 1, 1) = nb_instances;
                         obj.features(end + 1, 1) = nb_features;
                     end
@@ -86,13 +103,6 @@ classdef VisualDataset < Dataset
             is_verified = ismember(data_values, ids);
         end
         
-        function subset = get_subset(obj, criteria)
-            subset             = obj.get_subset@Dataset(criteria);
-            subset.labels      = subset.labels(criteria);
-            subset.instances   = subset.instances(criteria);
-            subset.features    = subset.features(criteria);
-        end
-        
         function set = merge_subsets(set1, set2)
             set = set1.merge_subsets@Dataset(set2);
             if ~isempty(set2)
@@ -100,6 +110,29 @@ classdef VisualDataset < Dataset
                 set.instances  = [set.instances; set2.instances];
                 set.features   = [set.features; set2.features];
             end
+        end
+    end
+    
+    %% Protected methods
+    methods (Access = protected)
+        function subset = get_subset_from_crit(obj, criteria)
+            subset = obj.get_subset_from_crit@Dataset(criteria);
+            subset.labels = obj.labels(criteria);
+            subset.instances = obj.instances(criteria);
+            subset.features = obj.features(criteria);
+            subset.ref_labels = obj.ref_labels;
+            subset.ref_instances = obj.ref_instances;
+            subset.ref_features = obj.ref_features;
+        end
+        
+        function subset = get_subset_from_linno(obj, linno)
+            subset = obj.get_subset_from_linno@Dataset(linno);
+            subset.labels = obj.labels(linno);
+            subset.instances = obj.instances(linno);
+            subset.features = obj.features(linno);
+            subset.ref_labels = obj.ref_labels;
+            subset.ref_instances = obj.ref_instances;
+            subset.ref_features = obj.ref_features;
         end
     end
 end
