@@ -1,6 +1,4 @@
-addpath(genpath('/home/bhigy/dev/tactile_objrec_mat'));
-
-format long
+init;
 
 %% Loading the data
 infos_filename = '/home/bhigy/data/experiments/20150527_1000/imginfos/data.log';

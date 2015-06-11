@@ -1,5 +1,4 @@
-addpath(genpath('/home/bhigy/dev/bh_tsne'));
-run('/home/bhigy/dev/vlfeat-0.9.20/toolbox/vl_setup')
+init;
 
 %% Clustering
 k = length(unique(Y));
