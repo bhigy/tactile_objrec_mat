@@ -96,24 +96,10 @@ classdef Dataset < matlab.mixin.Copyable
             end
         end
         
-%         function [set1, set2] = split(obj, split_value, mode)
-%             % Split the data based on the split_value and the split mode
-%             total_size = size(obj.data, 1);
-%             switch mode
-%                 case Dataset.SPLITMODE_PCT
-%                     size1 = round(total_size * split_value / 100);
-%                 case Dataset.SPLITMODE_ABS
-%                     size1 = split_value;
-%             end
-%             picked = Dataset.random_selection(size1, total_size);
-%             set1 = obj.get_subset(picked);
-%             set2 = obj.get_subset(~picked);
-%         end
-        
         function [set1, set2] = split(obj, split_value, mode, grouping)
             % Split the data of each category (based on 'grouping') 
             % depending on the 'split_value' and the split 'mode'
-            if isempty(grouping)
+            if ~exist('grouping', 'var') || isempty(grouping)
                 selection = Dataset.split_selection(size(obj.data, 1), split_value, mode);
                 set1 = obj.data(selection,:);
                 set2 = obj.data(~selection,:);
