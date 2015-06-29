@@ -11,40 +11,40 @@ classdef Datadump < Dataset
         function obj = Datadump(path)
             obj = obj@Dataset();
             if exist('path', 'var') && ~isempty(path)
-                obj.data        = load(path);
-                obj.timestamps  = obj.data(:,2);
-                obj.data        = obj.data(:,3:end);
+                obj.X        = load(path);
+                obj.timestamps  = obj.X(:,2);
+                obj.X        = obj.X(:,3:end);
             else
                 obj.timestamps = [];
             end
         end
         
         function obj = filter(obj, sequences)
-            i_data = 1;
-            [nb_lines, ~] = size(obj.data);
-            [i_max_seq, ~] = size(sequences);
-            for i_seq = 1:i_max_seq
+            i = 1;
+            [nbLines, ~] = size(obj.X);
+            [iSeqMax, ~] = size(sequences);
+            for iSeq = 1:iSeqMax
                 % removing lines before the sequence
-                t_seq = sequences(i_seq,1);
-                while i_data <= nb_lines && obj.timestamps(i_data) < t_seq
-                    obj.data(i_data,:) = [];
-                    obj.timestamps(i_data) = [];
-                    nb_lines = nb_lines - 1;
+                tSeq = sequences(iSeq,1);
+                while i <= nbLines && obj.timestamps(i) < tSeq
+                    obj.X(i,:) = [];
+                    obj.timestamps(i) = [];
+                    nbLines = nbLines - 1;
                 end
                 
                 % keeping lines in the sequence
-                t_seq = sequences(i_seq,2);
-                while i_data <= nb_lines && obj.timestamps(i_data) <= t_seq
-                    i_data = i_data + 1;
+                tSeq = sequences(iSeq,2);
+                while i <= nbLines && obj.timestamps(i) <= tSeq
+                    i = i + 1;
                 end
             end
             % removing lines after the last sequence
-            obj.data(i_data:end,:) = [];
-            obj.timestamps(i_data:end) = [];
+            obj.X(i:end,:) = [];
+            obj.timestamps(i:end) = [];
         end
 
-        function set = merge_subsets(set1, set2)
-            set = set1.merge_subsets@Dataset(set2);
+        function set = mergeSubsets(set1, set2)
+            set = set1.mergeSubsets@Dataset(set2);
             if ~isempty(set2)
                 set.timestamps = [set.timestamps; set2.timestamps];
             end
@@ -53,13 +53,13 @@ classdef Datadump < Dataset
     
     %% Protected methods
     methods (Access = protected)
-        function subset = get_subset_from_crit(obj, criteria)
-            subset              = obj.get_subset_from_crit@Dataset(criteria);
+        function subset = getSubsetFromCrit(obj, criteria)
+            subset              = obj.getSubsetFromCrit@Dataset(criteria);
             subset.timestamps   = obj.timestamps(criteria);
         end
 
-        function subset = get_subset_from_linno(obj, linno)
-            subset              = obj.get_subset_from_linno@Dataset(linno);
+        function subset = getSubsetFromLinno(obj, linno)
+            subset              = obj.getSubsetFromLinno@Dataset(linno);
             subset.timestamps   = obj.timestamps(linno);
         end
     end

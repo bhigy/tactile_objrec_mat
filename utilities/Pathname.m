@@ -2,7 +2,7 @@ classdef Pathname
     properties
         path
         name
-        full_path
+        fullPath
     end
     
     methods
@@ -15,8 +15,8 @@ classdef Pathname
             obj.name = name;
         end
         
-        function full_path = get.full_path(obj)
-            full_path = strcat(obj.path, obj.name);
+        function fullPath = get.fullPath(obj)
+            fullPath = strcat(obj.path, obj.name);
         end
     end
 end

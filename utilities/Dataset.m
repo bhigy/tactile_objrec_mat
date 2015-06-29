@@ -11,14 +11,14 @@ classdef Dataset < matlab.mixin.Copyable
     
     %% Members
     properties
-        data
+        X
     end
     
     %% Static methods
     methods (Static)
-        function selection = random_selection(m, n)
-            % Returns a vector of size n, with m '1' and everything else
-            % being '0'
+        function selection = selectRandom(m, n)
+            % Returns a vector of size n, with m '1' choosen randomly and 
+            % everything else being '0'
             selection = zeros(n, 1);
             for i = 1:m
                 line = ceil(rand()*n);
@@ -32,103 +32,103 @@ classdef Dataset < matlab.mixin.Copyable
     end
     
     methods (Static, Access = protected)
-        function selection = split_selection(size, split_value, mode)
+        function selection = splitSelection(size, splitValue, mode)
             % Select elements from a set of size 'size', based on
-            % split_value and mode
+            % splitValue and mode
             switch mode
                 case Dataset.SPLITMODE_PCT
-                    size_sub = round(size * split_value / 100);
+                    sizeSub = round(size * splitValue / 100);
                 case Dataset.SPLITMODE_ABS
-                    size_sub = split_value;
+                    sizeSub = splitValue;
             end
-            selection = Dataset.random_selection(size_sub, size);
+            selection = Dataset.selectRandom(sizeSub, size);
         end
     end
     
     %% Public methods
     methods
-        function obj = Dataset(data)
-             if ~exist('data', 'var')
-                 data = [];
+        function obj = Dataset(X)
+             if ~exist('X', 'var')
+                 X = [];
              end
-            obj.data = data;
+            obj.X = X;
         end
         
-        function new_obj = new(obj)
-            new_obj = eval(class(obj));
+        function newObj = new(obj)
+            newObj = eval(class(obj));
         end
         
         function subset = downsample(obj, factor)
             % Downsamples the dataset taking one line out of 'factor'
-            selection = zeros(size(obj.data, 1), 1);
+            selection = zeros(size(obj.X, 1), 1);
             selection(1:factor:end) = 1;
-            subset = obj.get_subset_from_crit(logical(selection));
+            subset = obj.getSubsetFromCrit(logical(selection));
         end
         
-        function points = get_2D_projection(obj, proj_meth)
-            switch proj_meth
+        function points = get2DProjection(obj, projMeth)
+            switch projMeth
                 case Dataset.METH_SVD
-                    [U, S, ~] = svd(obj.data);
+                    [U, S, ~] = svd(obj.X);
                     proj = U*S;
                     points = Points(proj(:,1), proj(:,2));
                 case Dataset.METH_TSNE
-                    proj = fast_tsne(obj.data);
+                    proj = fast_tsne(obj.X);
                     points = Points(proj(:,1), proj(:,2));
             end
         end
         
-        function subset = get_subset(obj, arg)
+        function subset = getSubset(obj, arg)
             switch class(arg)
                 case 'logical'
-                    subset = obj.get_subset_from_crit(arg);
+                    subset = obj.getSubsetFromCrit(arg);
                 case 'double'
-                    subset = obj.get_subset_from_linno(arg);
+                    subset = obj.getSubsetFromLinno(arg);
                 otherwise
                     error('Invalid argument');
             end
         end
         
-        function set = merge_subsets(set1, set2)
+        function set = mergeSubsets(set1, set2)
             % Merge 2 subsets
             set = set1.copy();
             if ~isempty(set2)
-                set.data = [set.data; set2.data];
+                set.X = [set.X; set2.X];
             end
         end
         
-        function [set1, set2] = split(obj, split_value, mode, grouping)
+        function [set1, set2] = split(obj, splitValue, mode, grouping)
             % Split the data of each category (based on 'grouping') 
-            % depending on the 'split_value' and the split 'mode'
+            % depending on the 'splitValue' and the split 'mode'
             if ~exist('grouping', 'var') || isempty(grouping)
-                selection = Dataset.split_selection(size(obj.data, 1), split_value, mode);
-                set1 = obj.data(selection,:);
-                set2 = obj.data(~selection,:);
+                selection = Dataset.splitSelection(size(obj.X, 1), splitValue, mode);
+                set1 = obj.X(selection,:);
+                set2 = obj.X(~selection,:);
             else
                 categories = unique(grouping);
                 indices1 = [];
                 indices2 = [];
                 for i = 1:length(categories)
                     indices = find(grouping == categories(i));
-                    selection = Dataset.split_selection(length(indices), split_value, mode);
+                    selection = Dataset.splitSelection(length(indices), splitValue, mode);
                     indices1 = [indices1; indices(selection)];
                     indices2 = [indices2; indices(~selection)];
                 end
-                set1 = obj.get_subset_from_linno(indices1);
-                set2 = obj.get_subset_from_linno(indices2);
+                set1 = obj.getSubsetFromLinno(indices1);
+                set2 = obj.getSubsetFromLinno(indices2);
             end
         end
     end
     
     %% Protected methods
     methods (Access = protected)
-        function subset = get_subset_from_crit(obj, criteria)
+        function subset = getSubsetFromCrit(obj, criteria)
             subset      = obj.new();
-            subset.data = obj.data(criteria,:);
+            subset.X = obj.X(criteria,:);
         end
         
-        function subset = get_subset_from_linno(obj, linno)
+        function subset = getSubsetFromLinno(obj, linno)
             subset      = obj.new();
-            subset.data = obj.data(linno,:);
+            subset.X = obj.X(linno,:);
         end
     end
 end

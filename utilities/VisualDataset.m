@@ -1,4 +1,4 @@
-classdef VisualDataset < Dataset
+classdef VisualDataset < SupervisedDataset
     % Visual dataset
     
     %% Properties
@@ -8,12 +8,13 @@ classdef VisualDataset < Dataset
         FEATURE = 3
     end
     properties %(Access = private)
-        ref_labels
-        ref_instances
-        ref_features
+        refLabels
+        refInstances
+        refFeatures
         labels
         instances
         features
+        catCriteria
     end
     
     %% Methods
@@ -22,13 +23,14 @@ classdef VisualDataset < Dataset
             % Constructor
             
             % Initialization
-            obj = obj@Dataset();
+            obj = obj@SupervisedDataset();
             obj.labels = [];
             obj.instances = [];
             obj.features = [];
-            obj.ref_labels = {};
-            obj.ref_instances = {};
-            obj.ref_features = {};
+            obj.refLabels = {};
+            obj.refInstances = {};
+            obj.refFeatures = {};
+            obj.catCriteria = VisualDataset.INSTANCE;
             
             if exist('path', 'var')
                 obj.load(path);
@@ -42,69 +44,77 @@ classdef VisualDataset < Dataset
             
             pos = strfind(path, '/');
             pos = pos(end);
-            folder_name = path(pos + 1:end);
+            folderName = path(pos + 1:end);
             path = path(1:pos -1);
-            d = Directory(path, folder_name);
-            sd = d.get_sub_dirs();
+            d = Directory(path, folderName);
+            sd = d.getSubDirs();
 
-            nb_labels_ini = length(obj.labels);
-            nb_instances = length(obj.instances);
-            nb_features = length(obj.features);
+            nbLabelsIni = length(obj.labels);
+            nbInstances = length(obj.instances);
+            nbFeatures = length(obj.features);
             
             for i = 1:length(sd)
-                obj.ref_labels(i) = {sd(i).name};
-                ssd = get_sub_dirs(sd(i));
+                obj.refLabels(i) = {sd(i).name};
+                ssd = getSubDirs(sd(i));
                 for j = 1:length(ssd)
-                    nb_instances = nb_instances + 1;
-                    obj.ref_instances(nb_instances) = {ssd(j).name};
-                    files = get_files(ssd(j));
+                    nbInstances = nbInstances + 1;
+                    obj.refInstances(nbInstances) = {ssd(j).name};
+                    files = getFiles(ssd(j));
                     for k = 1:length(files)
-                        nb_features = nb_features + 1;
-                        obj.ref_features(nb_features) = {files(k).name};
-                        obj.data = [obj.data; load(files(k).full_path)'];
-                        obj.labels(end + 1, 1) = nb_labels_ini + i;
-                        obj.instances(end + 1, 1) = nb_instances;
-                        obj.features(end + 1, 1) = nb_features;
+                        nbFeatures = nbFeatures + 1;
+                        obj.refFeatures(nbFeatures) = {files(k).name};
+                        obj.X = [obj.X; load(files(k).fullPath)'];
+                        obj.labels(end + 1, 1) = nbLabelsIni + i;
+                        obj.instances(end + 1, 1) = nbInstances;
+                        obj.features(end + 1, 1) = nbFeatures;
                     end
                 end
             end
         end
         
-        function infos = get_ref_infos(obj, type)
+        function Y = getY(obj)
+            Y = obj.getDataInfos(obj.catCriteria);
+        end
+        
+        function setCatCriteria(obj, catCriteria)
+            obj.catCriteria = catCriteria;
+        end
+        
+        function infos = getRefInfos(obj, type)
             switch type
                 case VisualDataset.LABEL
-                    infos = obj.ref_labels;
+                    infos = obj.refLabels;
                 case VisualDataset.INSTANCE
-                    infos = obj.ref_instances;
+                    infos = obj.refInstances;
                 case VisualDataset.FEATURE
-                    infos = obj.ref_features;
+                    infos = obj.refFeatures;
             end
         end
         
-        function data_infos = get_data_infos(obj, type)
+        function dataInfos = getDataInfos(obj, type)
             switch type
                 case VisualDataset.LABEL
-                    data_infos = obj.labels;
+                    dataInfos = obj.labels;
                 case VisualDataset.INSTANCE
-                    data_infos = obj.instances;
+                    dataInfos = obj.instances;
                 case VisualDataset.FEATURE
-                    data_infos = obj.features;
+                    dataInfos = obj.features;
             end
         end
         
-        function is_verified = check_condition(obj, column, allowed_values)
-            ref_values = obj.get_ref_infos(column);
-            data_values = obj.get_data_infos(column);
+        function isVerified = checkCondition(obj, column, allowedValues)
+            refValues = obj.getRefInfos(column);
+            dataValues = obj.getDataInfos(column);
             
             ids = [];
-            for i = 1:length(allowed_values)
-                ids = [ids find(strcmp(allowed_values(i), ref_values))];
+            for i = 1:length(allowedValues)
+                ids = [ids find(strcmp(allowedValues(i), refValues))];
             end
-            is_verified = ismember(data_values, ids);
+            isVerified = ismember(dataValues, ids);
         end
         
-        function set = merge_subsets(set1, set2)
-            set = set1.merge_subsets@Dataset(set2);
+        function set = mergeSubsets(set1, set2)
+            set = set1.mergeSubsets@Dataset(set2);
             if ~isempty(set2)
                 set.labels     = [set.labels; set2.labels];
                 set.instances  = [set.instances; set2.instances];
@@ -115,24 +125,24 @@ classdef VisualDataset < Dataset
     
     %% Protected methods
     methods (Access = protected)
-        function subset = get_subset_from_crit(obj, criteria)
-            subset = obj.get_subset_from_crit@Dataset(criteria);
+        function subset = getSubsetFromCrit(obj, criteria)
+            subset = obj.getSubsetFromCrit@Dataset(criteria);
             subset.labels = obj.labels(criteria);
             subset.instances = obj.instances(criteria);
             subset.features = obj.features(criteria);
-            subset.ref_labels = obj.ref_labels;
-            subset.ref_instances = obj.ref_instances;
-            subset.ref_features = obj.ref_features;
+            subset.refLabels = obj.refLabels;
+            subset.refInstances = obj.refInstances;
+            subset.refFeatures = obj.refFeatures;
         end
         
-        function subset = get_subset_from_linno(obj, linno)
-            subset = obj.get_subset_from_linno@Dataset(linno);
+        function subset = getSubsetFromLinno(obj, linno)
+            subset = obj.getSubsetFromLinno@Dataset(linno);
             subset.labels = obj.labels(linno);
             subset.instances = obj.instances(linno);
             subset.features = obj.features(linno);
-            subset.ref_labels = obj.ref_labels;
-            subset.ref_instances = obj.ref_instances;
-            subset.ref_features = obj.ref_features;
+            subset.refLabels = obj.refLabels;
+            subset.refInstances = obj.refInstances;
+            subset.refFeatures = obj.refFeatures;
         end
     end
 end
