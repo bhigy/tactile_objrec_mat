@@ -48,10 +48,11 @@ classdef Dataset < matlab.mixin.Copyable
     %% Public methods
     methods
         function obj = Dataset(X)
-             if ~exist('X', 'var')
-                 X = [];
-             end
-            obj.X = X;
+            if ~exist('X', 'var')
+                obj.X = [];
+            else
+                obj.X = X;
+            end
         end
         
         function newObj = new(obj)
@@ -115,6 +116,24 @@ classdef Dataset < matlab.mixin.Copyable
                 end
                 set1 = obj.getSubsetFromLinno(indices1);
                 set2 = obj.getSubsetFromLinno(indices2);
+            end
+        end
+        
+        function N = normalize(obj)
+            N = obj.copy;
+            m = mean(N.X);
+            s = std(N.X);
+            for i = 1:size(N.X,1)
+                N.X(i,:) = (N.X(i,:) - m) ./ s;
+            end
+        end
+        
+        function N = centralize(obj)
+            N = obj.copy;
+            m = mean(N.X);
+            s = std(N.X);
+            for i = 1:size(N.X,1)
+                N.X(i,:) = (N.X(i,:) - m);
             end
         end
     end

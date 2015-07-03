@@ -1,3 +1,4 @@
+addpath(genpath('/home/bhigy/dev/tactile_objrec_mat'));
 init;
 
 %% Loading all data
@@ -6,7 +7,7 @@ init;
 load('/home/bhigy/experiments/venerdi26/dataset.mat');
 
 %% Configuration
-scenario = 6;
+scenario = 5;
 
 switch scenario
     case 1
@@ -27,20 +28,20 @@ switch scenario
         filter_by = VisualDataset.LABEL;
     case 5
         % all instances x all labels - clustering on instances
-        samples = dataset.get_ref_infos(VisualDataset.LABEL);
+        samples = dataset.getRefInfos(VisualDataset.LABEL);
         filter_by = [];
     case 6
         % all instances x all labels - clustering on labels
-        samples = dataset.get_ref_infos(VisualDataset.LABEL);
+        samples = dataset.getRefInfos(VisualDataset.LABEL);
         filter_by = [];
 end
 
 
 %% Filtering unwanted samples
 if isempty(filter_by)
-    X = dataset.copy();
+    S = dataset.copy();
 else
-    X = dataset.get_subset(dataset.check_condition(filter_by, samples));    
+    S = dataset.getSubset(dataset.check_condition(filter_by, samples));    
 end
 
 %% Preparing for clustering
@@ -66,10 +67,10 @@ switch scenario
 end
 switch cluster_by
     case VisualDataset.LABEL
-        labels = X.get_ref_infos(VisualDataset.LABEL);
-        Y = X.get_data_infos(VisualDataset.LABEL);
+        labels = S.getRefInfos(VisualDataset.LABEL);
+        Y = S.getDataInfos(VisualDataset.LABEL);
      case VisualDataset.INSTANCE
-        labels = X.get_ref_infos(VisualDataset.INSTANCE);
-        Y = X.get_data_infos(VisualDataset.INSTANCE);
+        labels = S.getRefInfos(VisualDataset.INSTANCE);
+        Y = S.getDataInfos(VisualDataset.INSTANCE);
 end
 labels = labels(unique(Y));

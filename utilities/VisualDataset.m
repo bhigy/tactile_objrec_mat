@@ -1,4 +1,4 @@
-classdef VisualDataset < SupervisedDataset
+classdef VisualDataset < ASupervisedDataset
     % Visual dataset
     
     %% Properties
@@ -23,7 +23,7 @@ classdef VisualDataset < SupervisedDataset
             % Constructor
             
             % Initialization
-            obj = obj@SupervisedDataset();
+            obj = obj@ASupervisedDataset();
             obj.labels = [];
             obj.instances = [];
             obj.features = [];
@@ -114,7 +114,7 @@ classdef VisualDataset < SupervisedDataset
         end
         
         function set = mergeSubsets(set1, set2)
-            set = set1.mergeSubsets@Dataset(set2);
+            set = set1.mergeSubsets@ASupervisedDataset(set2);
             if ~isempty(set2)
                 set.labels     = [set.labels; set2.labels];
                 set.instances  = [set.instances; set2.instances];
@@ -126,7 +126,7 @@ classdef VisualDataset < SupervisedDataset
     %% Protected methods
     methods (Access = protected)
         function subset = getSubsetFromCrit(obj, criteria)
-            subset = obj.getSubsetFromCrit@Dataset(criteria);
+            subset = obj.getSubsetFromCrit@ASupervisedDataset(criteria);
             subset.labels = obj.labels(criteria);
             subset.instances = obj.instances(criteria);
             subset.features = obj.features(criteria);
@@ -136,7 +136,7 @@ classdef VisualDataset < SupervisedDataset
         end
         
         function subset = getSubsetFromLinno(obj, linno)
-            subset = obj.getSubsetFromLinno@Dataset(linno);
+            subset = obj.getSubsetFromLinno@ASupervisedDataset(linno);
             subset.labels = obj.labels(linno);
             subset.instances = obj.instances(linno);
             subset.features = obj.features(linno);
