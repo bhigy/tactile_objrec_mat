@@ -4,6 +4,21 @@ classdef Points
         Y
     end
     
+    methods(Static)
+        function m = marker(value)
+            persistent marker;
+            if isempty(marker)
+                marker = '+';
+            end
+            
+            if exist('value', 'var') && ~isempty(value)
+                marker = value;
+            end
+            
+            m = marker;
+        end
+    end
+    
     methods
         function obj = Points(X, Y)
             obj.X = X;
@@ -20,7 +35,7 @@ classdef Points
             figure;
             hold all;
             for i = 1:length(grps)
-                plot(obj.X(grouping == grps(i)), obj.Y(grouping == grps(i)), 'MarkerEdgeColor', colors(i,:), 'Marker', '.', 'LineStyle', 'none');
+                plot(obj.X(grouping == grps(i)), obj.Y(grouping == grps(i)), 'MarkerEdgeColor', colors(i,:), 'Marker', obj.marker, 'LineStyle', 'none');
             end
             if length(grps) > 1
                 if isempty(labels)

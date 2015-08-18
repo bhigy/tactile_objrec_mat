@@ -66,14 +66,18 @@ classdef Dataset < matlab.mixin.Copyable
             subset = obj.getSubsetFromCrit(logical(selection));
         end
         
-        function points = get2DProjection(obj, projMeth)
+        function points = get2DProjection(obj, projMeth, perplexity)
             switch projMeth
                 case Dataset.METH_SVD
                     [U, S, ~] = svd(obj.X);
                     proj = U*S;
                     points = Points(proj(:,1), proj(:,2));
                 case Dataset.METH_TSNE
-                    proj = fast_tsne(obj.X);
+                    if exist('perplexity', 'var') && ~isempty(perplexity)
+                        proj = fast_tsne(obj.X, [], [], perplexity);
+                    else
+                        proj = fast_tsne(obj.X);
+                    end
                     points = Points(proj(:,1), proj(:,2));
             end
         end

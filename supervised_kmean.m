@@ -3,7 +3,7 @@ init;
 
 [test, training] = S.split(50, Dataset.SPLITMODE_ABS);
 [training, validation] = training.split(50, Dataset.SPLITMODE_PCT);
-kValues = 1:1:length(unique(training.X, 'rows'));
+kValues = 1:50:length(unique(training.X, 'rows'));
 
 accuracy = kmeanAccuracy(training, validation, kValues, 10);
 

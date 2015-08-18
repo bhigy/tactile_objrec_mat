@@ -1,9 +1,9 @@
+addpath(genpath('/home/bhigy/dev/tactile_objrec_mat'));
 init;
 
 %% Clustering
 k = length(unique(Y));
 [clusters, clus_membership] = vl_kmeans(X.data', k);
-
 
 %% Computing some measures
 % for each cluster we compute the most frequent label

@@ -11,9 +11,9 @@ classdef Datadump < Dataset
         function obj = Datadump(path)
             obj = obj@Dataset();
             if exist('path', 'var') && ~isempty(path)
-                obj.X        = load(path);
+                obj.X = import(path);
                 obj.timestamps  = obj.X(:,2);
-                obj.X        = obj.X(:,3:end);
+                obj.X = obj.X(:,3:end);
             else
                 obj.timestamps = [];
             end
