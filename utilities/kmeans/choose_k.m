@@ -1,4 +1,4 @@
-function [k, accuracy, model] = choose_k(Str, Svl, nb_trials, impr_min, impr_step)
+function [k, accuracy, model] = choose_k(Str, Svl, nb_trials, impr_min, impr_step, display)
 % Select the best value for k, i.e. the one after which we don't have
 % any improvement
 %   Str (SupervisedDataset):    the training set 
@@ -7,9 +7,14 @@ function [k, accuracy, model] = choose_k(Str, Svl, nb_trials, impr_min, impr_ste
 %   impr_min (decimal):         the minimal improvement we allow
 %   impr_step (integer):        the number of steps the improvement should be
 %                               below impMin before we stop
+%   display (bool):             display processing details
 
     if ~exist('nb_trials', 'var') || isempty(nb_trials)
         nb_trials = 10;
+    end
+    
+    if ~exist('display', 'var') || isempty(display)
+        display = 0;
     end
 
     k = 0;
@@ -21,7 +26,9 @@ function [k, accuracy, model] = choose_k(Str, Svl, nb_trials, impr_min, impr_ste
         
         % Checking the improvement
         mean_accuracy = mean(accuracy);
-        disp(['k = ', num2str(k), ' - mean score = ', num2str(mean_accuracy * 100), '%']);
+        if display == 1
+            disp(['k = ', num2str(k), ' - mean score = ', num2str(mean_accuracy * 100), '%']);
+        end
         if (mean_accuracy - accuracy) / accuracy * 100 >= impr_min
             nbSteps = 0;
             accuracy = mean_accuracy;

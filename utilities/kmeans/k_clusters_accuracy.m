@@ -1,4 +1,4 @@
-function [accuracy, best_model] = k_clusters_accuracy(Str, Svl, k, nb_trials)
+function [accuracy, best_model, Ypred, conf_matrix] = k_clusters_accuracy(Str, Svl, k, nb_trials)
 % Computes the mean accuracy over several trials for one value of k
 %   Str (SupervisedDataset):    training set
 %   Svl (SupervisedDataset):    validation set
@@ -37,11 +37,13 @@ function [accuracy, best_model] = k_clusters_accuracy(Str, Svl, k, nb_trials)
 
         % computing the score
         confus = compute_confusion_matrix(Yvl, Yvl_pred);
-        accuracy(trial) = mean(arrayfun(@(x) confus(x,x)/sum(confus(x,:)), 1:size(confus, 1)));
+        accuracy(trial) = accuracy_from_conf_matrix(confus);
 
         if accuracy(trial) > best_accuracy
             best_model = C;
             best_accuracy = accuracy(trial);
+            conf_matrix = confus;
+            Ypred =  Yvl_pred;
         end
     end
 end
