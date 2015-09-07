@@ -4,6 +4,7 @@ init;
 
 %% Parameters
 SET_PRETEST = 1;
+SET_HAPTIC1 = 2;
 
 set = SET_PRETEST;  % set to be used
 
@@ -12,7 +13,7 @@ do_load    = 0;
 do_merge   = 0;
 do_split   = 0;
 do_prepare = 1;
-do_analyse = 0;
+do_analyse = 1;
 
 hd_init;
 
@@ -37,6 +38,7 @@ if do_prepare == 1
     disp('-- Preparing data for analysis');
     use_finger = [1 0 1 0];
     use_data   = [1 0 1 1 1];
+    standardize = 1;
     hd_prepare;
 end
 

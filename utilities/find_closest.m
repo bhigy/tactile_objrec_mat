@@ -1,5 +1,5 @@
-function [values, indexes] = findClosest(source, target)
-% findClosestTimestamps Foreach value in source, find the closest value in target
+function [values, indexes] = find_closest(source, target)
+% Foreach value in source, find the closest value in target
 % source and target values are supposed to be sorted in increasing order
     
     iTarget = 1;

@@ -61,4 +61,12 @@ training.X = training.X(:, i_keep);
 validation.X = validation.X(:, i_keep);
 test.X = test.X(:, i_keep);
 
+if standardize == 1
+    S = S.standardize();
+    no_test = no_test.standardize();
+    training = training.standardize();
+    validation = validation.standardize();
+    test = test.standardize();
+end
+
 save([root, filtered_filename], 'S', 'no_test', 'training', 'validation', 'test', 'objects');

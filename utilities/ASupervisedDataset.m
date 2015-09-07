@@ -1,6 +1,7 @@
 classdef ASupervisedDataset < Dataset
     methods (Abstract)
         getY(obj)
+        removeCat(obj, c)
     end
     
     methods

@@ -31,6 +31,12 @@ classdef BasicSupervisedDataset < ASupervisedDataset
             Y = obj.Y;
         end
         
+        function removeCat(obj, c)
+            lines = find(obj.Y == c);
+            obj.Y(lines, :) = [];
+            obj.X(lines, :) = [];
+        end
+        
         function set = mergeSubsets(set1, set2)
             set = set1.mergeSubsets@SupervisedDataset(set2);
             if ~isempty(set2)

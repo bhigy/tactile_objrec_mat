@@ -33,7 +33,7 @@ labels = erase(labels, invalid_trials);
 
 % Selectin the mesures to keep
 % 1 - Finding the closest event which should be the close command
-[~, lines] = findClosest(labels{2}, events{2});
+[~, lines] = find_closest(labels{2}, events{2});
 % 2 - Going to the second next event, which should be the home command
 lines = lines + 2;
 t_home = events{2}(lines);
@@ -53,11 +53,11 @@ else
         t_mesures(j_first:j_last) = first:step:last;
     end
 end
-[~, i_analog]   = findClosest(t_mesures, analog(:, 2));
-[~, i_state]    = findClosest(t_mesures, state(:, 2));
-[~, i_springy]  = findClosest(t_mesures, springy(:, 2));
-[~, i_skin]     = findClosest(t_mesures, skin(:, 2));
-[~, i_skinComp] = findClosest(t_mesures, skinComp(:, 2));
+[~, i_analog]   = find_closest(t_mesures, analog(:, 2));
+[~, i_state]    = find_closest(t_mesures, state(:, 2));
+[~, i_springy]  = find_closest(t_mesures, springy(:, 2));
+[~, i_skin]     = find_closest(t_mesures, skin(:, 2));
+[~, i_skinComp] = find_closest(t_mesures, skinComp(:, 2));
 % 4 - Taking the mean of the mesures (if we took several) for each grasp
 if(nb_mesures == 1)
     analog_filtered    = analog(i_analog, :);

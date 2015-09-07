@@ -13,7 +13,7 @@ labels   = load_file([root, 'dump/grasper/labels/data.log'], '%d %f %s');
 events   = load_file([root, 'dump/grasper/events/data.log'], '%d %f %s %q');
 analog   = load([root, 'dump/left_arm/analog/data.log']);
 state    = load([root, 'dump/left_arm/state/data.log']);
-springy  = load([root, 'dump/model/springy/data2.log']);
+springy  = load([root, 'dump/model/springy/data.log']);
 skin     = load([root, 'dump/skin/left_hand/data.log']);
 skinComp = load([root, 'dump/skin/left_hand_comp/data.log']);
 

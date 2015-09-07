@@ -17,4 +17,8 @@ switch(set)
     case SET_PRETEST
         root           = '/home/bhigy/experiments/haptic_data_pretest/';    % root folder
         invalid_trials = 30;                                                % invalid trials to remove
+        
+    case SET_HAPTIC1
+        root           = '/home/bhigy/experiments/haptic_data/';    % root folder
+        invalid_trials = [25 62 75 114 149 150 202];                    % invalid trials to remove
 end

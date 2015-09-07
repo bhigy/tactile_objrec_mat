@@ -123,10 +123,11 @@ classdef Dataset < matlab.mixin.Copyable
             end
         end
         
-        function N = normalize(obj)
+        function N = standardize(obj)
             N = obj.copy;
             m = mean(N.X);
             s = std(N.X);
+            s(s == 0) = 1; % avoid dividing by 0
             for i = 1:size(N.X,1)
                 N.X(i,:) = (N.X(i,:) - m) ./ s;
             end
@@ -135,7 +136,6 @@ classdef Dataset < matlab.mixin.Copyable
         function N = centralize(obj)
             N = obj.copy;
             m = mean(N.X);
-            s = std(N.X);
             for i = 1:size(N.X,1)
                 N.X(i,:) = (N.X(i,:) - m);
             end
