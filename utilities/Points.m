@@ -27,7 +27,7 @@ classdef Points
         
         function draw(obj, grouping, labels)
             if isempty(grouping)
-                grouping = zeroes(length(obj.X), 1);
+                grouping = zeros(length(obj.X), 1);
             end
             
             grps = unique(grouping);

@@ -19,6 +19,9 @@ classdef Dataset < matlab.mixin.Copyable
         function selection = selectRandom(m, n)
             % Returns a vector of size n, with m '1' choosen randomly and 
             % everything else being '0'
+            if (m > n)
+                error('Invalid arguments (m > n)'); 
+            end
             selection = zeros(n, 1);
             for i = 1:m
                 line = ceil(rand()*n);
@@ -125,20 +128,12 @@ classdef Dataset < matlab.mixin.Copyable
         
         function N = standardize(obj)
             N = obj.copy;
-            m = mean(N.X);
-            s = std(N.X);
-            s(s == 0) = 1; % avoid dividing by 0
-            for i = 1:size(N.X,1)
-                N.X(i,:) = (N.X(i,:) - m) ./ s;
-            end
+            N.X = standardize(N.X);
         end
         
         function N = centralize(obj)
             N = obj.copy;
-            m = mean(N.X);
-            for i = 1:size(N.X,1)
-                N.X(i,:) = (N.X(i,:) - m);
-            end
+            N.X = centralize(N.X);
         end
     end
     

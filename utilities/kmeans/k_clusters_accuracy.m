@@ -15,7 +15,7 @@ function [accuracy, best_model, Ypred, conf_matrix] = k_clusters_accuracy(Str, S
     Yvl = Svl.getY();
     Yvl_pred = zeros(size(Xvl,1), 1);
     accuracy = zeros(nb_trials, 1);
-    best_accuracy = 0;
+    best_accuracy = -1;
 
     for trial = 1:nb_trials
         % computing clusters on the training set

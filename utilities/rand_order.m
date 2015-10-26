@@ -7,6 +7,7 @@ function O = rand_order(labels, times)
         I(i:j, 1) = items;
     end
     I = I(randperm(length(I)));
+    O = cell(nb_items * times);
     for i = 1:length(labels)
         O(I==i) = labels(i);
     end
