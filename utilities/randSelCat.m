@@ -1,6 +1,6 @@
 function selection = randomSelectionCat(m, grouping)
-    % Returns a vector of size n, with m '1' choosen randomly and 
-    % everything else being '0'
+    % Returns a vector of the same size as grouping, with m '1' choosen randomly 
+    % for each category (defined by grouping) and everything else being '0'
     
     len = length(grouping);
     if (m > length(grouping))
