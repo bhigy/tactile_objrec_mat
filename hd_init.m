@@ -8,6 +8,7 @@ function param = hd_init(datasets, set)
     % Columns from raw data
     param.raw_cols.analog      = 2:8;
     param.raw_cols.skin        = [2:14, 15:26, 27:38, 39:50, 51:62, 99:109, 111:121, 123:133, 135:141, 143:146];
+    param.raw_cols.skin_comp   = param.raw_cols.skin;
     param.raw_cols.springy     = 2:7;
     param.raw_cols.state       = [2 11:18];
     param.raw_cols.wrench      = 2:8;
@@ -30,7 +31,6 @@ function param = hd_init(datasets, set)
 
     % Other params
     param.grasp_duration = 2;
-    param.standardize    = 1;
 
     % Parameters specific to the dataset
     switch(set)
@@ -55,10 +55,21 @@ function param = hd_init(datasets, set)
             param.event_offset = 2;
         case datasets.HAPTIC2
             % root folder
-            param.root = '/home/bhigy/experiments/haptic_data_21102015/';
+            param.root = '/home/bhigy/experiments/haptic_data_20151021/';
+            param.loading_routine = @hdl_20151021;
             % invalid trials to remove
             param.invalid_trials = [10 12 13 14 25 29 47 49 51 61 70 73 78 87 115 124 127 129 132 134 143 159 165 168 184 206 209 ...
                                     217 223 226 227 233 263 270 271 273 275 278 292 295 297 321 331 333 335 339 343 358 360 381 383 386 401 405];
             param.nb_items_test = 9;
+        case datasets.HAPTIC3
+            % root folder
+            param.root = '/home/bhigy/experiments/haptic_data_20151028/';
+            param.loading_routine = @hdl_20151028;
+            % invalid trials to remove
+            param.invalid_trials = [55];
+            param.nb_items_test = 9;
+            % rign and little finger are not working
+            param.raw_cols.springy     = 2:5;
+            param.raw_cols.state       = [2 11:17];
     end
 end

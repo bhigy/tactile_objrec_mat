@@ -4,21 +4,22 @@ init;
 
 %% Parameters
 enum.dataset.PRETEST = 1;
-enum.dataset.HAPTIC1 = 2;    % Set with 2 fingers and no tactile data
+enum.dataset.HAPTIC1 = 2;   % Set with 2 fingers and no tactile data
 enum.dataset.WEIGH   = 3;
-enum.dataset.HAPTIC2 = 4;    % Complete set
+enum.dataset.HAPTIC2 = 4;   % Complete set, bad wrench
+enum.dataset.HAPTIC3 = 5;   % No tactile data, no ring and little finger
 
 % Branching parameters
 do_load               = 0;
 do_extract_actions    = 0;
-do_analyse            = 0;
+do_analyse            = 1;
 
-param = hd_init(enum.dataset, enum.dataset.HAPTIC2);
+param = hd_init(enum.dataset, enum.dataset.HAPTIC3);
 
-%% Data loading
+%% Data loading 
 if do_load == 1
     disp('-- Loading raw data');
-    raw_data = hd_load([param.root, 'dump/']);
+    raw_data = param.loading_routine(param.root);
     
     save([param.root, param.filenames.raw], '-v7.3', 'raw_data');
 end
@@ -26,13 +27,26 @@ end
 if do_extract_actions == 1
     load([param.root, param.filenames.raw]);
     
-    disp('-- Filtering');
+    disp('-- Filtering invalid trials');
     raw_data.labels = erase(raw_data.labels, param.invalid_trials);
 
     disp('-- Extracting actions');
-    grasp  = hd_extract_sequence(raw_data, param.raw_cols, 0, 1);
-    weigh  = hd_extract_sequence(raw_data, param.raw_cols, 2, 3);
-    rotate = hd_extract_sequence(raw_data, param.raw_cols, 4, 5);
+    starting_events = getStartingEvents(raw_data);
+    
+    % Grasp action
+    t_starting_event = raw_data.events{2}(starting_events) + 0.01;
+    t_ending_event   = raw_data.events{2}(starting_events + 2);
+    grasp = hd_extract_sequence(raw_data, param.raw_cols, t_starting_event, t_ending_event);
+    
+    % Weigh action
+    t_starting_event = raw_data.events{2}(starting_events + 2);
+    t_ending_event   = raw_data.events{2}(starting_events + 3);
+    weigh  = hd_extract_sequence(raw_data, param.raw_cols, t_starting_event, t_ending_event);
+    
+    % Rotate action
+    t_starting_event = raw_data.events{2}(starting_events + 4);
+    t_ending_event   = raw_data.events{2}(starting_events + 5);
+    rotate = hd_extract_sequence(raw_data, param.raw_cols, t_starting_event, t_ending_event);
 
     labels = raw_data.labels{3};
     save([param.root, param.filenames.raw_actions], 'labels', 'grasp', 'weigh', 'rotate');
@@ -41,32 +55,44 @@ end
 %% Analysis
 if do_analyse == 1
     load([param.root, param.filenames.raw_actions]);
-    
-    disp('-- Computing features')
-    t_snapshot = grasp.t_end - param.grasp_duration / 2;
-    Xs = hdf_snapshot(grasp, t_snapshot, [0 1 1 0 1 1 0]);
-    
-    ft = rotate.analog;
-    Xf1 = hdf_fourier(hd_extract_col(ft, 2));
-    Xf2 = hdf_fourier(hd_extract_col(ft, 3));
-    Xf3 = hdf_fourier(hd_extract_col(ft, 4));
-    Xf4 = hdf_fourier(hd_extract_col(ft, 5));
-    Xf5 = hdf_fourier(hd_extract_col(ft, 6));
-    Xf6 = hdf_fourier(hd_extract_col(ft, 7));
-    
-    [Xnb, Xmean, Xstd] = hd_compute_moments(grasp.skin_comp, 2:105);
-    Xtn = hdf_fourier(Xnb);
-    Xtm = hdf_fourier(Xmean);
-    Xts = hdf_fourier(Xstd);
-    
-    X = [Xtm Xts];
-    if param.standardize == 1
-        X = standardize_matrix(X);
-    end
-    
     [Y, objects] = labels_to_Y(labels);
 
     disp('-- Analysing data');
-%     hda_kmeans;
-    hda_rls;
+
+%     disp('-- Force/torque');
+%     hde_force_torque;
+%     save([param.root, 'matlab/hde_force_torque.mat'], 'Ypred', 'Ytest', 'confidence');
+
+%     disp('-- Modalities');
+%     hde_modalities;
+%     save([param.root, 'matlab/hde_modalities.mat'], 'Ypred', 'Ytest', 'confidence');
+    
+%     disp('-- Confidence combination');
+%     hde_confidence_combination;
+%     save([param.root, 'matlab/hde_confidence_combination.mat'], 'Ytr', 'Ytr_pred1', 'Yva', 'Yva_pred1', 'Yva_pred2', 'Yte', 'Yte_pred1', 'Yte_pred2', 'confidence');
+    
+%     disp('-- Sample');
+%     hde_sample;
+%     save([param.root, 'matlab/hde_samples.mat'], 'Ypred', 'Ytest', 'confidence');
+    
+%     [Ypred, Ytest, confidence] = hde_moments;
+%     hde_moments_res.Ypred = Ypred;
+%     hde_moments_res.Ytest = Ytest;
+%     hde_moments_res.conf= confidence;
+
+    
+    % accuracy = zeros(length(X), nb_iter);
+    % confus = cell(length(X), nb_iter);
+    % C = cell(length(X), 1);
+    % for i = 1:length(X)
+    %     C{i} = zeros(length(objects));
+    %     for j = 1:size(Ypred{i}, 1)
+    %         accuracy(i, j) = sum(Ypred{i}(j, :) == Ytest{i}(j, :)) / length(Ypred{i}(j, :));
+    %         confus{i, j} = compute_confusion_matrix(Ypred{i}(j, :), Ytest{i}(j, :));
+    %         C{i} = C{i} + confus{i, j};
+    %     end
+    %     C{i} = C{i} ./ (nb_iter * param.nb_items_test);
+    %     M = mean(accuracy, 2);
+    %     S = std(accuracy, 0, 2);
+    % end
 end

@@ -1,4 +1,4 @@
-[U, S, ~] = svd(Xf1);
+[U, S, ~] = svd(X);
 proj = U*S;
 X = proj(:, 1:9);
 

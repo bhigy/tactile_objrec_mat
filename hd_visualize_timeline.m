@@ -1,5 +1,5 @@
-% D = hd_extract_col(weigh.wrench, 5);
-D = Xmean;
+D = hd_extract_col(grasp.wrench, 2);
+% D = Xmean;
 
 %% Plotting data
 % categories = unique(labels);
@@ -7,10 +7,11 @@ D = Xmean;
 
 figure;
 hold on;
-range = 1:359;
+range = 1:length(D);
 for i = range
 %     cat_id = find(arrayfun(@(x) isequal(categories(x), labels{3}(i)), 1:length(categories)));
 %     plot(data, 'Color', colors(cat_id, :));
+    % Colored based on time from the beginning
 %     plot(D{i}, 'Color', [1 / length(D) * i, 0, 0]);
     plot(D{i});
 %     l = data;
@@ -18,10 +19,3 @@ for i = range
 end
 legend(labels(range));
 hold off;
-
-% wrench-2
-%[1:5, 7:8, 10:23, 25:30, 32:158, 160:173, 175:269, 271:length(D)]
-% wrench-3
-%[1:5, 7:8, 10:158, 160:173, 175:269, 271:length(D)]
-% wrench-4
-%[1:5, 7:8, 10:158, 160:173, 175:269, 271:length(D)]

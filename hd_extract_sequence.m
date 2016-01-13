@@ -1,49 +1,33 @@
-function event_data = hd_extract_sequence(data, raw_cols, start_offset, end_offset)
+function seq_data = hd_extract_sequence(data, raw_cols, t_starting_event, t_ending_event)
     % Selecting for each trial the lines corresponding to a sequence
-    % (starting with an event and ending with an other one)
+    % (between to timestamps)
 
-    [~, i_starting_lines] = find_closest(data.labels{2}, data.events{2});
-    % Sometimes, the label has the same timestamp as the give-ack
-    wrong = strcmp(data.events{3}(i_starting_lines), 'reply');
-    i_starting_lines(wrong) = i_starting_lines(wrong) + 1;
-    
-    i_ending_lines = i_starting_lines + end_offset;
-    i_starting_lines = i_starting_lines + start_offset;
     nb_trials = length(data.labels{2});
     
-    event_data.analog      = cell(nb_trials, 1);
-    event_data.skin        = cell(nb_trials, 1);
-    event_data.skin_comp   = cell(nb_trials, 1);
-    event_data.springy     = cell(nb_trials, 1);
-    event_data.state       = cell(nb_trials, 1);
-    event_data.wrench      = cell(nb_trials, 1);
-    event_data.cart_wrench = cell(nb_trials, 1);
+    seq_data.analog      = cell(nb_trials, 1);
+    seq_data.skin        = cell(nb_trials, 1);
+    seq_data.skin_comp   = cell(nb_trials, 1);
+    seq_data.springy     = cell(nb_trials, 1);
+    seq_data.state       = cell(nb_trials, 1);
+    seq_data.wrench      = cell(nb_trials, 1);
+    seq_data.cart_wrench = cell(nb_trials, 1);
+    seq_data.t_start     = t_starting_event;
+    seq_data.t_end       = t_ending_event;
     
-    t_starting_event = data.events{2}(i_starting_lines);
-    t_ending_event   = data.events{2}(i_ending_lines);
-    event_data.t_start = t_starting_event;
-    event_data.t_end   = t_ending_event;
-    
-    for trial = 1:nb_trials
-        lines = find_between(t_starting_event(trial), t_ending_event(trial), data.analog(:, 2));
-        event_data.analog{trial} = data.analog(lines, raw_cols.analog);
-        
-        lines = find_between(t_starting_event(trial), t_ending_event(trial), data.skin(:, 2));
-        event_data.skin{trial} = data.skin(lines, raw_cols.skin);
-        
-        lines = find_between(t_starting_event(trial), t_ending_event(trial), data.skin_comp(:, 2));
-        event_data.skin_comp{trial} = data.skin_comp(lines, raw_cols.skin);
-        
-        lines = find_between(t_starting_event(trial), t_ending_event(trial), data.springy(:, 2));
-        event_data.springy{trial} = data.springy(lines, raw_cols.springy);
-        
-        lines = find_between(t_starting_event(trial), t_ending_event(trial), data.state(:, 2));
-        event_data.state{trial} = data.state(lines, raw_cols.state);
-        
-        lines = find_between(t_starting_event(trial), t_ending_event(trial), data.wrench(:, 2));
-        event_data.wrench{trial} = data.wrench(lines, raw_cols.wrench);
-        
-        lines = find_between(t_starting_event(trial), t_ending_event(trial), data.cart_wrench(:, 2));
-        event_data.cart_wrench{trial} = data.cart_wrench(lines, raw_cols.cart_wrench);
+    % List of modalities we want to go through
+    fields = {'analog', 'skin', 'skin_comp', 'springy', 'state', 'wrench', 'cart_wrench'};
+
+    for i=1:numel(fields)
+        if ~isempty(data.(fields{i}))
+            start = 1;
+            for trial = 1:nb_trials
+                % We start looking from where we stopped previously
+                lines = find_between(t_starting_event(trial), t_ending_event(trial), data.(fields{i})(start:end, 2));
+                % We correct the index
+                lines = lines + start - 1;
+                seq_data.(fields{i}){trial} = data.(fields{i})(lines, raw_cols.(fields{i}));
+                start = lines(end) + 1;
+            end
+        end
     end
 end

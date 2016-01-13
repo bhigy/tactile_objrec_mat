@@ -15,25 +15,6 @@ classdef Dataset < matlab.mixin.Copyable
     end
     
     %% Static methods
-    methods (Static)
-        function selection = selectRandom(m, n)
-            % Returns a vector of size n, with m '1' choosen randomly and 
-            % everything else being '0'
-            if (m > n)
-                error('Invalid arguments (m > n)'); 
-            end
-            selection = zeros(n, 1);
-            for i = 1:m
-                line = ceil(rand()*n);
-                while selection(line) == 1
-                    line = ceil(rand()*n);
-                end
-                selection(line) = 1;
-            end
-            selection = logical(selection);
-        end
-    end
-    
     methods (Static, Access = protected)
         function selection = splitSelection(size, splitValue, mode)
             % Select elements from a set of size 'size', based on
@@ -44,7 +25,7 @@ classdef Dataset < matlab.mixin.Copyable
                 case Dataset.SPLITMODE_ABS
                     sizeSub = splitValue;
             end
-            selection = Dataset.selectRandom(sizeSub, size);
+            selection = randSel(sizeSub, size);
         end
     end
     
