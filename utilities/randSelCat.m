@@ -1,4 +1,4 @@
-function selection = randomSelectionCat(m, grouping)
+function selection = randSelCat(m, grouping)
     % Returns a vector of the same size as grouping, with m '1' choosen randomly 
     % for each category (defined by grouping) and everything else being '0'
     

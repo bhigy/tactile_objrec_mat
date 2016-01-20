@@ -70,29 +70,10 @@ if do_analyse == 1
 %     disp('-- Confidence combination');
 %     hde_confidence_combination;
 %     save([param.root, 'matlab/hde_confidence_combination.mat'], 'Ytr', 'Ytr_pred1', 'Yva', 'Yva_pred1', 'Yva_pred2', 'Yte', 'Yte_pred1', 'Yte_pred2', 'confidence');
-    
-%     disp('-- Sample');
-%     hde_sample;
-%     save([param.root, 'matlab/hde_samples.mat'], 'Ypred', 'Ytest', 'confidence');
-    
+
 %     [Ypred, Ytest, confidence] = hde_moments;
 %     hde_moments_res.Ypred = Ypred;
 %     hde_moments_res.Ytest = Ytest;
 %     hde_moments_res.conf= confidence;
 
-    
-    % accuracy = zeros(length(X), nb_iter);
-    % confus = cell(length(X), nb_iter);
-    % C = cell(length(X), 1);
-    % for i = 1:length(X)
-    %     C{i} = zeros(length(objects));
-    %     for j = 1:size(Ypred{i}, 1)
-    %         accuracy(i, j) = sum(Ypred{i}(j, :) == Ytest{i}(j, :)) / length(Ypred{i}(j, :));
-    %         confus{i, j} = compute_confusion_matrix(Ypred{i}(j, :), Ytest{i}(j, :));
-    %         C{i} = C{i} + confus{i, j};
-    %     end
-    %     C{i} = C{i} ./ (nb_iter * param.nb_items_test);
-    %     M = mean(accuracy, 2);
-    %     S = std(accuracy, 0, 2);
-    % end
 end

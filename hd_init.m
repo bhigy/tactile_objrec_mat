@@ -31,31 +31,32 @@ function param = hd_init(datasets, set)
 
     % Other params
     param.grasp_duration = 2;
+    data_dir = '/home/bhigy/data/icub/';
 
     % Parameters specific to the dataset
     switch(set)
         case datasets.PRETEST
             % root folder
-            param.root = '/home/bhigy/experiments/haptic_data_pretest/';
+            param.root = [data_dir, 'haptic_data_pretest/'];
             % invalid trials to remove
             param.invalid_trials = 30;
             param.nb_items_test = 2;
         case datasets.HAPTIC1
             % root folder
-            param.root = '/home/bhigy/experiments/haptic_data/';
+            param.root = [data_dir, 'haptic_data/'];
             % invalid trials to remove
             param.invalid_trials = [25 62 75 114 149 150 202];
             param.nb_items_test = 8;
         case datasets.WEIGH
             % root folder
-            param.root = '/home/bhigy/experiments/weigh_test/';
+            param.root = [data_dir, 'weigh_test/'];
             % invalid trials to remove
             param.invalid_trials = [];
             param.nb_items_test = [];
             param.event_offset = 2;
         case datasets.HAPTIC2
             % root folder
-            param.root = '/home/bhigy/experiments/haptic_data_20151021/';
+            param.root = [data_dir, 'haptic_data_20151021/'];
             param.loading_routine = @hdl_20151021;
             % invalid trials to remove
             param.invalid_trials = [10 12 13 14 25 29 47 49 51 61 70 73 78 87 115 124 127 129 132 134 143 159 165 168 184 206 209 ...
@@ -63,7 +64,7 @@ function param = hd_init(datasets, set)
             param.nb_items_test = 9;
         case datasets.HAPTIC3
             % root folder
-            param.root = '/home/bhigy/experiments/haptic_data_20151028/';
+            param.root = [data_dir, 'haptic_data_20151028/'];
             param.loading_routine = @hdl_20151028;
             % invalid trials to remove
             param.invalid_trials = [55];

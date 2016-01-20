@@ -1,4 +1,4 @@
-function selection = randomSelection(m, n)
+function selection = randSel(m, n)
     % Returns a vector of size n, with m '1' choosen randomly and 
     % everything else being '0'
     
