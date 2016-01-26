@@ -28,7 +28,7 @@ if do_extract_actions == 1
     load([param.root, param.filenames.raw]);
     
     disp('-- Filtering invalid trials');
-    raw_data.labels = erase(raw_data.labels, param.invalid_trials);
+    raw_data.labels = eraseCells(raw_data.labels, param.invalid_trials);
 
     disp('-- Extracting actions');
     starting_events = getStartingEvents(raw_data);

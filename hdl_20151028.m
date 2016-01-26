@@ -57,7 +57,7 @@ function data = hdl_20151028(root)
     % Filtering
     to_skip = find(strcmp(data.labels{3}, 'skip'));
     to_skip = [to_skip; (to_skip - 1)];
-    data.labels = erase(data.labels, to_skip);
+    data.labels = eraseCells(data.labels, to_skip);
     to_skip = find(strcmp(data.labels{3}, 'bigb'));
-    data.labels = erase(data.labels, to_skip);
+    data.labels = eraseCells(data.labels, to_skip);
 end
