@@ -66,6 +66,10 @@ if do_analyse == 1
 %     disp('-- Modalities');
 %     hde_modalities;
 %     save([param.root, 'matlab/hde_modalities.mat'], 'Ypred', 'Ytest', 'confidence');
+
+%     disp('-- Standardisation');
+%     hde_standardisations;
+%     save([param.root, 'matlab/hde_standardisation.mat'], 'Ypred', 'Ytest', 'confidence');
     
 %     disp('-- Confidence combination');
 %     hde_confidence_combination;

@@ -10,6 +10,7 @@ i = 1;
 for i_mod = 1:numel(fields)
     if ~isempty(grasp.(fields{i_mod}))
         cols = 2:size(grasp.(fields{i_mod}){1}, 2);
+        % ???
         if strcmp(fields{i_mod}, 'springy')
             cols = 2:size(grasp.(fields{i_mod}){1}, 2); 
         elseif strcmp(fields{i_mod}, 'state')
