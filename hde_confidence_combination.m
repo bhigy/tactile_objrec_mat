@@ -22,4 +22,5 @@ for i_mod = 1:numel(fields)
     end
 end
 
-[Ytr, Ytr_pred1, Yva, Yva_pred1, Yva_pred2, Yte, Yte_pred1, Yte_pred2, confidence] = hda_hierarchical_rls(X, Y, nb_iter, 10, param.nb_items_test);
+[Ytr, Ytr_pred1, Ytr_pred2, Yte, Yte_pred1, Yte_pred2, confidence] = hda_hierarchical_rls(X, Y, nb_iter, param.nb_items_test);
+% [Ytr, Ytr_pred1, Yva, Yva_pred1, Yva_pred2, Yte, Yte_pred1, Yte_pred2, confidence] = hda_hierarchical_rls_with_val(X, Y, nb_iter, 10, param.nb_items_test);

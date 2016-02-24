@@ -68,13 +68,18 @@ if do_analyse == 1
 %     save([param.root, 'matlab/hde_modalities.mat'], 'Ypred', 'Ytest', 'confidence');
 
 %     disp('-- Standardisation');
-%     hde_standardisations;
+%     hde_standardisation;
 %     save([param.root, 'matlab/hde_standardisation.mat'], 'Ypred', 'Ytest', 'confidence');
     
 %     disp('-- Confidence combination');
 %     hde_confidence_combination;
+%     save([param.root, 'matlab/hde_confidence_combination.mat'], 'Ytr', 'Ytr_pred1', 'Ytr_pred2', 'Yte', 'Yte_pred1', 'Yte_pred2', 'confidence');
 %     save([param.root, 'matlab/hde_confidence_combination.mat'], 'Ytr', 'Ytr_pred1', 'Yva', 'Yva_pred1', 'Yva_pred2', 'Yte', 'Yte_pred1', 'Yte_pred2', 'confidence');
 
+%     disp('-- Trials combination');
+%     hde_combine_trials_modalities;
+%     save([param.root, 'matlab/hde_trials_combination.mat'], 'M');
+    
 %     [Ypred, Ytest, confidence] = hde_moments;
 %     hde_moments_res.Ypred = Ypred;
 %     hde_moments_res.Ytest = Ytest;

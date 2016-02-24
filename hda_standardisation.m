@@ -14,11 +14,11 @@ M = mean(res, 2);
 S = std(res, 0, 2);
 
 % Display
-Mbar = [M(1:2)'; M(3:4)'; M(5:6)'; 0 M(7)];
-Sbar = [S(1:2)'; S(3:4)'; S(5:6)'; 0 S(7)];
+Mbar = [M(1:2)'; M(3:4)'; M(5:6)'; M(7:8)'; 0 M(9); 0 M(10); 0 M(11)];
+Sbar = [S(1:2)'; S(3:4)'; S(5:6)'; S(7:8)'; 0 S(9); 0 S(10); 0 S(11)];
 figure;
 hb = bar(Mbar);
-set(gca,'xticklabel', {'springy model', 'joints', 'F/T (wrist, cartesian)', 'combined'});
+set(gca,'xticklabel', {'analog', 'springy model', 'joints', 'F/T (wrist, cartesian)', '1+2+3+4', '1+3+4', '3+4'});
 legend('snapshot', 'standardised');
 ylabel('Mean accuracy (% of good recognition)');
 line([0, 5], [1/11, 1/11], 'Color', 'red');

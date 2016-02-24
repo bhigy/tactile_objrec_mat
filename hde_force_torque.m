@@ -1,5 +1,6 @@
 nb_iter = 10;
-fields = {'analog', 'wrench', 'cart_wrench'};
+% fields = {'analog', 'wrench', 'cart_wrench'};
+fields = {'analog', 'springy', 'state', 'wrench', 'cart_wrench'};
 
 X = cell(length(fields) * 3, 1);
 
@@ -22,4 +23,4 @@ for i_mod = 1:numel(fields)
     end
 end
 
-[Ypred, Ytest, confidence] = hda_rls(X, Y, nb_iter, param.nb_items_test);
+% [Ypred, Ytest, confidence] = hda_rls(X, Y, nb_iter, param.nb_items_test);
