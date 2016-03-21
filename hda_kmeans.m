@@ -6,7 +6,7 @@ k_values  = 1:size(unique(training.X, 'rows'), 1);
 
 %% Splitting the haptic data
 S = BasicSupervisedDataset(X, Y);
-N = min(count_occurences(Y));
+N = min(countOccurences(Y));
 S = S.split(N, Dataset.SPLITMODE_ABS);
 
 % Splitting data into training, validation and test sets
