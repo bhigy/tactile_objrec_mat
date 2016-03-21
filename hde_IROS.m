@@ -59,14 +59,15 @@ ResBin = load([param.root, 'matlab/binary/for_Bertrand_EP Grasp both all modalit
 % Final score
 ScoreBin = 65;
 % Histograms - grasp
-scores = ResBin.for_Bertrand.scoreTensor;
+scores = ResBin.for_Bertrand.scoreTensor * 100;
 nb_conditions = size(scores, 3);
 nb_classifiers = nb_cat * (nb_cat - 1) / 2;
-[Max, ~] = max(scores, [], 3);
-MBin = sum(Max(:)) / nb_classifiers;
-Hist = arrayfun(@(x)sum(sum(Max == scores(:,:,x))), 1:nb_conditions);
-Hist = (Hist - nb_cat * nb_cat + nb_classifiers) / nb_classifiers * 100;
+[MaxBin, ~] = max(scores, [], 3);
+MBin = sum(MaxBin(:)) / nb_classifiers;
+Hist = arrayfun(@(x)sum(sum(MaxBin == scores(:,:,x))), 1:nb_conditions);
+Hist = (Hist - nb_cat * nb_cat + nb_classifiers) / nb_classifiers;
 Hist = reshape(Hist, nb_conditions / 2, 2);
+objects = ResBin.for_Bertrand.object;
 
 % Scores - all
 ResBinAll = load([param.root, 'matlab/binary-sign/for_Bertrand.mat']);
@@ -121,15 +122,25 @@ HistAll = HistAll * 100;
 MScoreBSi = ResBin.for_Bertrand.score_final * 100;
 
 %% Trials combination
-ResTrialsComb = load([param.root, 'matlab/hde_trials_combination.mat']);
-MTrialsComb = ResTrialsComb.M(:, sort([1:3:15, 2:3:15])) * 100;
+ResTrialsCombMod = load([param.root, 'matlab/hde_trials_combination.mat']);
+MTrialsCombMod = ResTrialsCombMod.M(:, sort([1:3:15, 2:3:15])) * 100;
+ResTrialsCombEP.M = [   0.8081    0.7576    0.6465    0.4747
+                        0.8914    0.8586    0.7222    0.5328
+                        0.9318    0.9004    0.7781    0.5465
+                        0.9589    0.9271    0.8009    0.5765
+                        0.9841    0.9343    0.8276    0.5974
+                        0.9957    0.9426    0.8355    0.6180
+                        1.0000    0.9495    0.8535    0.6389
+                        1.0000    0.9495    0.8889    0.6768
+                        1.0000    0.9091    0.9091    0.6364];
+MTrialsCombEP = ResTrialsCombEP.M * 100;
 
 
 
 %% ********************************************************************* %%
 folderSave = '/home/bhigy/data/icub/haptic_data_20151028/pictures/IROS_2016/';
 
-labelAnalog = '      F/T\newline(shoulder)';
+labelAnalog = '  F/T\newline(raw)';
 labelSpringy = ' Hand\newlinesprings';
 labelState = '  Joints\newlinepositions';
 labelWrench = '       F/T\newline(wrist, palm)';
@@ -152,8 +163,20 @@ line([0, 6], [100/11, 100/11], 'Color', 'red');
 % barstd(hb, MBar, SBar);
 export_fig([folderSave, 'modalities.pdf'], '-transparent');
 
-%% Binary Classifiers
+%% Pair-wise binary classifiers
 fig = figure('Position', [0, 0, 1920, 1080]);
+imagesc(MaxBin);
+colorbar;
+objectsLabels = {'Blue ball', 'Tea box', 'Yellow cup', 'Empty water bottle', ...
+    'Full water bottle', 'Green bottle', 'Round box', 'Sponge', 'Tennis ball', ...
+    'Toy', 'Turtle'};
+set(gca,'fontsize',18)
+set(gca, 'xticklabel', objectsLabels, 'XTickLabelRotation', 45);
+set(gca, 'yticklabel', objectsLabels);
+export_fig([folderSave, 'binary_pairs.pdf'], '-transparent');
+
+%% Binary Classifiers
+figure('Position', [0, 0, 1920, 1080]);
 hb = bar(Hist);
 set(hb(1),'FaceColor',[0 .4 .6]);
 set(hb(2),'FaceColor',[1 .65 0]);
@@ -161,8 +184,6 @@ set(gca,'fontsize',24)
 set(gca, 'xticklabel', {labelAnalog, labelSpringy, labelState, labelWrench, labelCartWrench});
 legend('snapshot', 'fourier');
 ylabel(titlePercentage);
-% print_IROS([folderSave, 'binary.pdf']);
-% printpdf(fig, [folderSave, 'binary.pdf']);
 export_fig([folderSave, 'binary.pdf'], '-transparent');
 
 %% Combining
@@ -171,18 +192,19 @@ figure('Position', [0, 0, 1920, 1080]);
 hb = bar(Mbar);
 set(hb(1),'FaceColor',[0 .4 .6]);
 set(gca,'fontsize',18)
-set(gca,'xticklabel', {'joints-snapshot', 'concat', 'sum', 'conf-comb', 'binary', 'binary-sign'});
+set(gca,'xticklabel', {'    Joints\newline(snapshot)', 'Concatenation', 'Averaging', ...
+    'Hierarchical\newline(multi-class)', 'Hierarchical\newline   (binary)', ...
+    ' Hierarchical\newline(binary-sign)'});
 ylabel(titleAccuracy);
 export_fig([folderSave, 'combination.pdf'], '-transparent');
 
 %% Binary classifiers - all strategies
 figure('Position', [0, 0, 1920, 1080]);
-hb = bar(HistAll(:,1));
+hb = bar(HistAll(4:end,1));
 set(hb(1),'FaceColor',[0 .4 .6]);
 set(gca,'fontsize',18);
-set(gca,'xticklabel', {' F/T\newline(all)', labelSpringy, labelState, ...
-    'Grasping\newlinesnapshot', 'Grasping\newline fourier', 'Grasping\newline   both', ...
-    'Weighing', 'Rotating', '     All\newlineconditions'});
+set(gca,'xticklabel', {' Grasp EP\newline(snapshot)', 'Grasp EP\newline(fourier)', ...
+    'Grasp EP\newline (both)', 'Rotate EP', 'Weigh EP', 'All EPs'});
 ylabel(titlePercentage);
 export_fig([folderSave, 'all_strategies.pdf'], '-transparent');
 % hb = bar(HistAll);
@@ -193,19 +215,24 @@ export_fig([folderSave, 'all_strategies.pdf'], '-transparent');
 % legend('normal', 'super');
 % ylabel('Percentage of binary classifiers that achieve best score');
 
-%% Combining several grasps
+%% Combining several grasps (modalities)
 figure('Position', [0, 0, 1920, 1080]);
-% subplot(1, 2, 1);
-plot(MTrialsComb(:, 1:2:10), 'LineWidth', 1.5, 'MarkerSize', 15, 'Marker', '.');
+plot(MTrialsCombMod(:, 1:2:10), 'LineWidth', 1.5, 'MarkerSize', 15, 'Marker', '.');
 set(gca,'fontsize',18);
 ylabel(titleAccuracy);
 xlabel('Number of grasps');
-legend({'F/T (shoulder)', 'Hand springs', 'Joints positions', 'F/T (wrist, palm)', 'F/T (wrist, root)'}, ...
-    'Location','none', 'Position', [0.750, 0.675, 0, 0]);
-% subplot(1, 2, 2);
-% plot(MTrialsComb(:, 2:2:10), 'LineWidth', 1.5, 'MarkerSize', 15, 'Marker', '.');
-% set(gca,'fontsize',18);
-% ylabel('Mean accuracy (% of good recognition)');
-% xlabel('Number of grasps');
-% legend('F/T (shoulder)', 'Hand springs model', 'Joints positions', 'F/T (wrist, palm ref)', 'F/T (wrist, root ref)', 'Location','northoutside');
-export_fig([folderSave, 'several_grasps.pdf'], '-transparent');
+axis([0, 10, 0, 100]);
+legend({'F/T (raw)', 'Hand springs', 'Joints positions', 'F/T (wrist, palm)', 'F/T (wrist, root)'}, ...
+    'Location','none', 'Location', 'northeast');
+%legend('F/T (raw)', 'Hand springs model', 'Joints positions', 'F/T (wrist, palm ref)', 'F/T (wrist, root ref)', 'Location','northoutside');
+export_fig([folderSave, 'several_grasps_mod.pdf'], '-transparent');
+
+%% Combining several grasps (EPs)
+figure('Position', [0, 0, 1920, 1080]);
+plot(MTrialsCombEP, 'LineWidth', 1.5, 'MarkerSize', 15, 'Marker', '.');
+set(gca,'fontsize',18);
+ylabel(titleAccuracy);
+xlabel('Number of grasps');
+axis([0, 10, 0, 100]);
+legend({'All EPs', 'Grasp', 'Rotate', 'Weigh'}, 'Location', 'east');
+export_fig([folderSave, 'several_grasps_ep.pdf'], '-transparent');
