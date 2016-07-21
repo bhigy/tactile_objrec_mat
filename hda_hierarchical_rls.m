@@ -1,6 +1,8 @@
 function [Ytr, Ytr_pred1, Ytr_pred2, Yte, Yte_pred1, Yte_pred2, confidence] = hda_hierarchical_rls(Xsets, Y, nb_iter, nb_items_test)
+%HDA_HIERARCHICAL_RLS Trains two levels of classifiers with RLS
 
     % TODO : gérer une matrice pour Xsets
+    % TODO : use two step of hda_rls instead
     
     nb_sets = length(Xsets);
     nb_cats = length(unique(Y));
@@ -33,17 +35,30 @@ function [Ytr, Ytr_pred1, Ytr_pred2, Yte, Yte_pred1, Yte_pred2, confidence] = hd
             Ytr = Y(~sel_te);
             last = first + nb_cats - 1;
             
-            [~, model] = evalc('gurls_train(Xtr, Ytr)');
-            [~, Ytr_pred1{j}(i, :)] = evalc('gurls_test(model, Xtr)');
-            Xtr_hier(:, first:last) = model.pred;
-            [~, Yte_pred1{j}(i, :)] = evalc('gurls_test(model, Xte)');
-            Xte_hier(:, first:last) = model.pred;
-            
+%             [~, model] = evalc('gurls_train(Xtr, Ytr)');
+            model = gurls_train(Xtr, Ytr, struct('verbose', false));
+%             [~, Ytr_pred1{j}(i, :)] = evalc('gurls_test(model, Xtr)');
+%             Xtr_hier(:, first:last) = model.pred;
+            scores = gurls_test(model, Xtr);
+            Xtr_hier(:, first:last) = scores;
+            Ytr_pred1{j}(i, :) = score2pred(model, scores);
+%             [~, Yte_pred1{j}(i, :)] = evalc('gurls_test(model, Xte)');
+%             Xte_hier(:, first:last) = model.pred;
+            scores = gurls_test(model, Xte);
+            Xte_hier(:, first:last) = scores;
+            Yte_pred1{j}(i, :) = score2pred(model, scores);
+
             first = first + nb_cats;
         end
-        [~, model] = evalc('gurls_train(Xtr_hier, Ytr)');
-        [~, Ytr_pred2{1}(i, :)] = evalc('gurls_test(model, Xtr_hier)');
-        [~, Yte_pred2{1}(i, :)] = evalc('gurls_test(model, Xte_hier)');
-        confidence{1, i} = model.pred;
+%         [~, model] = evalc('gurls_train(Xtr_hier, Ytr)');
+        model = gurls_train(Xtr_hier, Ytr, struct('verbose', false));
+%         [~, Ytr_pred2{1}(i, :)] = evalc('gurls_test(model, Xtr_hier)');
+        scores = gurls_test(model, Xtr_hier);
+        Ytr_pred2{1}(i, :) = score2pred(model, scores);
+%         [~, Yte_pred2{1}(i, :)] = evalc('gurls_test(model, Xte_hier)');
+%         confidence{1, i} = model.pred;
+        scores = gurls_test(model, Xte_hier);
+        confidence{1, i} = scores;
+        Yte_pred2{1}(i, :) = score2pred(model, scores);
     end 
 end

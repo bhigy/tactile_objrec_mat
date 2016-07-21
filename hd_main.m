@@ -40,9 +40,15 @@ if do_analyse
     load([param.root, param.filenames.XY]);
     nb_iter = 10;
     
-%     disp('--- Condition-specific classifiers')
+%     disp('--- Condition-specific multi-class classifiers')
 %     [Ypred, Ytest, confidence] = hda_rls(X, Y, nb_iter, param.nb_items_test);
 %     save([param.root, 'matlab/hde_all_conditions.mat'], 'Ypred', 'Ytest', 'confidence', 'contexts');
+
+    disp('--- Condition-specific binary classifiers classifiers')
+%     [Xsub, Ysub] = hd_subsample(X(1:2), Y, 3);
+%     [Ypred, Ytest, confidence] = hda_binary_rls(Xsub, Ysub, 2, param.nb_items_test);
+    [Ypred, Ytest, confidence] = hda_binary_rls(X, Y, nb_iter, param.nb_items_test);
+    save([param.root, 'matlab/hde_all_conditions_binary.mat'], 'Ypred', 'Ytest', 'confidence', 'contexts');
 
 %     disp('--- Concatenation');
 %     Xconcat{1} = [X{ismember(conditions(:,1), 'grasp') & ismember(conditions(:,3), 'snapshot')}];

@@ -1,4 +1,5 @@
 function [Ypred, Yte, confidence] = hda_rls(Xsets, Y, nb_iter, nb_items_test)
+%HDA_RLS Trains multi-class classifiers with RLS
 
     % TODO : gérer une matrice pour Xsets
     
@@ -20,9 +21,10 @@ function [Ypred, Yte, confidence] = hda_rls(Xsets, Y, nb_iter, nb_items_test)
             Ytr = Y(~sel);
             Xte = Xsets{j}(sel, :);
             Yte{j}(i, :) = Y(sel)';
-            [~, model] = evalc('gurls_train(Xtr, Ytr)');
-            [~, Ypred{j}(i, :)] = evalc('gurls_test(model, Xte)');
-            confidence{j, i} = model.pred;
+            model = gurls_train(Xtr, Ytr, struct('verbose', false));
+            scores = gurls_test(model, Xte);
+            confidence{j, i} = scores;
+            Ypred{j}(i, :) = score2pred(model, scores);
         end
     end 
 end
