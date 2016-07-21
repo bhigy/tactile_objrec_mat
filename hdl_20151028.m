@@ -1,5 +1,5 @@
 function data = hdl_20151028(root)
-    % Loading haptic data
+    % Loading haptic data for the dataset from 28/10/2015
 
     if ~exist('root', 'var') || isempty(root)
         error('Unknownk variable "root"');

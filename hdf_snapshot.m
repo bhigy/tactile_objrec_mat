@@ -1,4 +1,5 @@
 function F = hdf_snapshot(data, timestamps, cols)
+%HDF_SNAPSHOT
 
     F = zeros(size(data, 1), length(cols));
     

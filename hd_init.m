@@ -1,9 +1,10 @@
-function param = hd_init(datasets, set)
+function param = hd_init(datasets, set, home_folder)
     % Initializing some global parameters
 
     % Filenames
     param.filenames.raw         = 'matlab/raw_data.mat';        % raw data filename
     param.filenames.raw_actions = 'matlab/raw_actions.mat';     % raw actions data filename
+    param.filenames.XY          = 'matlab/XY.mat';              % data in X and Y format
 
     % Columns from raw data
     param.raw_cols.analog      = 2:8;
@@ -31,7 +32,7 @@ function param = hd_init(datasets, set)
 
     % Other params
     param.grasp_duration = 2;
-    data_dir = '/home/bhigy/data/icub/';
+    data_dir = [home_folder, 'data/icub/'];
 
     % Parameters specific to the dataset
     switch(set)

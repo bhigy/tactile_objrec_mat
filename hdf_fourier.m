@@ -1,4 +1,5 @@
 function F = hdf_fourier(data)
+%HDF_FOURIER
 
     % Computing the max size (not all series may have the same size)
     nb_lines = size(data, 1);

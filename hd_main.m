@@ -10,70 +10,52 @@ enum.dataset.HAPTIC2 = 4;   % Complete set, bad wrench
 enum.dataset.HAPTIC3 = 5;   % No tactile data, no ring and little finger
 
 % Branching parameters
-do_load               = 0;
-do_extract_actions    = 0;
-do_analyse            = 1;
+do_load         = false;
+do_extract_feat = false;
+do_analyse      = true;
 
-param = hd_init(enum.dataset, enum.dataset.HAPTIC3);
+param = hd_init(enum.dataset, enum.dataset.HAPTIC3, home_folder);
 
 %% Data loading 
-if do_load == 1
-    disp('-- Loading raw data');
-    raw_data = param.loading_routine(param.root);
-    
-    save([param.root, param.filenames.raw], '-v7.3', 'raw_data');
+if do_load
+    disp('-- Loading data');
+    [data, labels] = hd_load(param);
+    save([param.root, param.filenames.raw_actions], 'labels', 'data');
 end
 
-if do_extract_actions == 1
-    load([param.root, param.filenames.raw]);
-    
-    disp('-- Filtering invalid trials');
-    raw_data.labels = eraseCells(raw_data.labels, param.invalid_trials);
-
-    disp('-- Extracting actions');
-    starting_events = getStartingEvents(raw_data);
-    
-    % Grasp action
-    t_starting_event = raw_data.events{2}(starting_events) + 0.01;
-    t_ending_event   = raw_data.events{2}(starting_events + 2);
-    grasp = hd_extract_sequence(raw_data, param.raw_cols, t_starting_event, t_ending_event);
-    
-    % Weigh action
-    t_starting_event = raw_data.events{2}(starting_events + 2);
-    t_ending_event   = raw_data.events{2}(starting_events + 3);
-    weigh  = hd_extract_sequence(raw_data, param.raw_cols, t_starting_event, t_ending_event);
-    
-    % Rotate action
-    t_starting_event = raw_data.events{2}(starting_events + 4);
-    t_ending_event   = raw_data.events{2}(starting_events + 5);
-    rotate = hd_extract_sequence(raw_data, param.raw_cols, t_starting_event, t_ending_event);
-
-    labels = raw_data.labels{3};
-    save([param.root, param.filenames.raw_actions], 'labels', 'grasp', 'weigh', 'rotate');
+if do_extract_feat
+    disp('-- Transforming the data into X and Y');
+    load([param.root, param.filenames.raw_actions]);
+    actions = {'grasp', 'weigh', 'rotate'};
+    modalities = {'analog', 'springy', 'state', 'wrench', 'cart_wrench'};
+    features = {'snapshot', 'fourier'};
+    [X, conditions] = hd_extract_features(data, actions, modalities, features, param);
+    [Y, objects] = labels_to_Y(labels);
+    save([param.root, param.filenames.XY], 'X', 'Y', 'objects', 'conditions');
 end
 
 %% Analysis
-if do_analyse == 1
-    load([param.root, param.filenames.raw_actions]);
-    [Y, objects] = labels_to_Y(labels);
-
+if do_analyse
     disp('-- Analysing data');
+    load([param.root, param.filenames.XY]);
+    nb_iter = 10;
+    
+%     disp('--- Condition-specific classifiers')
+%     [Ypred, Ytest, confidence] = hda_rls(X, Y, nb_iter, param.nb_items_test);
+%     save([param.root, 'matlab/hde_all_conditions.mat'], 'Ypred', 'Ytest', 'confidence', 'contexts');
 
-%     disp('-- Force/torque');
-%     hde_force_torque;
-%     save([param.root, 'matlab/hde_force_torque.mat'], 'Ypred', 'Ytest', 'confidence');
-
-%     disp('-- Modalities');
-%     hde_modalities;
+%     disp('--- Concatenation');
+%     Xconcat{1} = [X{ismember(conditions(:,1), 'grasp') & ismember(conditions(:,3), 'snapshot')}];
+%     Xconcat{2} = [X{ismember(conditions(:,1), 'grasp') & ismember(conditions(:,3), 'fourier')}];
+%     Xconcat{3} = [X{ismember(conditions(:,1), 'grasp')}];
+%     [Ypred, Ytest, confidence] = hda_rls(Xconcat, Y, nb_iter, param.nb_items_test);
 %     save([param.root, 'matlab/hde_modalities.mat'], 'Ypred', 'Ytest', 'confidence');
 
-%     disp('-- Standardisation');
-%     hde_standardisation;
-%     save([param.root, 'matlab/hde_standardisation.mat'], 'Ypred', 'Ytest', 'confidence');
-    
 %     disp('-- Confidence combination');
-%     hde_confidence_combination;
+%     Xconcat{3} = X(ismember(conditions(:,1), 'grasp'));
+%     [Ytr, Ytr_pred1, Ytr_pred2, Yte, Yte_pred1, Yte_pred2, confidence] = hda_hierarchical_rls(X, Y, nb_iter, param.nb_items_test);
 %     save([param.root, 'matlab/hde_confidence_combination.mat'], 'Ytr', 'Ytr_pred1', 'Ytr_pred2', 'Yte', 'Yte_pred1', 'Yte_pred2', 'confidence');
+%     [Ytr, Ytr_pred1, Yva, Yva_pred1, Yva_pred2, Yte, Yte_pred1, Yte_pred2, confidence] = hda_hierarchical_rls_with_val(X, Y, nb_iter, 10, param.nb_items_test);
 %     save([param.root, 'matlab/hde_confidence_combination.mat'], 'Ytr', 'Ytr_pred1', 'Yva', 'Yva_pred1', 'Yva_pred2', 'Yte', 'Yte_pred1', 'Yte_pred2', 'confidence');
 
 %     disp('-- Trials combination');
