@@ -1,4 +1,6 @@
-function param = hd_init(datasets, set, home_folder)
+function param = hd_init_params(datasets, set, home_folder)
+%HD_INIT_PARAMS Initializes the parameters
+
     % Initializing some global parameters
 
     % Filenames

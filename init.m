@@ -1,4 +1,3 @@
-home_folder = '/home/local/IIT/bhigy/';
 addpath(genpath([home_folder, 'dev/bh_tsne']));
 addpath(genpath([home_folder, 'dev/tactile_objrec_mat']));
 % addpath(genpath([home_folder, 'dev/objrecpipe_mat']));

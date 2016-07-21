@@ -1,5 +1,5 @@
 % Main script controlling the overall pipeline
-addpath(genpath('/home/bhigy/dev/tactile_objrec_mat'));
+conf;
 init;
 
 %% Parameters
@@ -14,7 +14,7 @@ do_load         = false;
 do_extract_feat = false;
 do_analyse      = true;
 
-param = hd_init(enum.dataset, enum.dataset.HAPTIC3, home_folder);
+param = hd_init_params(enum.dataset, enum.dataset.HAPTIC3, home_folder);
 
 %% Data loading 
 if do_load
@@ -48,7 +48,7 @@ if do_analyse
 %     [Xsub, Ysub] = hd_subsample(X(1:2), Y, 3);
 %     [Ypred, Ytest, confidence] = hda_binary_rls(Xsub, Ysub, 2, param.nb_items_test);
     [Ypred, Ytest, confidence] = hda_binary_rls(X, Y, nb_iter, param.nb_items_test);
-    save([param.root, 'matlab/hde_all_conditions_binary.mat'], 'Ypred', 'Ytest', 'confidence', 'contexts');
+    save([param.root, 'matlab/hde_all_conditions_binary.mat'], 'Ypred', 'Ytest', 'confidence', 'conditions');
 
 %     disp('--- Concatenation');
 %     Xconcat{1} = [X{ismember(conditions(:,1), 'grasp') & ismember(conditions(:,3), 'snapshot')}];
