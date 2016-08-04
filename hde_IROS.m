@@ -187,14 +187,15 @@ ylabel(titlePercentage);
 export_fig([folderSave, 'binary.pdf'], '-transparent');
 
 %% Combining
-Mbar = [MMod(3, 1); MCat(end); MSum; MComb; ScoreBin; MScoreBSi];
+sinapov = 51.3;
+Mbar = [MMod(3, 1); MCat(end); MSum; sinapov; MComb; ScoreBin; MScoreBSi];
 figure('Position', [0, 0, 1920, 1080]);
 hb = bar(Mbar);
 set(hb(1),'FaceColor',[0 .4 .6]);
 set(gca,'fontsize',18)
-set(gca,'xticklabel', {'    Joints\newline(snapshot)', 'Concatenation', 'Averaging', ...
-    'Hierarchical\newline(multi-class)', 'Hierarchical\newline   (binary)', ...
-    ' Hierarchical\newline(binary-sign)'});
+set(gca,'xticklabel', {'    Joints\newline(snapshot)', 'Concatenation', ....
+    'Averaging', '  Averaging [17]', 'Hierarchical\newline(multi-class)', ...
+    'Hierarchical\newline   (binary)', ' Hierarchical\newline(binary-sign)'});
 ylabel(titleAccuracy);
 export_fig([folderSave, 'combination.pdf'], '-transparent');
 
