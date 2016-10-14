@@ -195,9 +195,22 @@ set(hb(1),'FaceColor',[0 .4 .6]);
 set(gca,'fontsize',18)
 set(gca,'xticklabel', {'    Joints\newline(snapshot)', 'Concatenation', ....
     'Averaging', '  Averaging [17]', 'Hierarchical\newline(multi-class)', ...
-    'Hierarchical\newline   (binary)', ' Hierarchical\newline(binary-sign)'});
+    'Hierarchical\newline(binary)', ' Hierarchical\newline(binary-sign)'});
 ylabel(titleAccuracy);
 export_fig([folderSave, 'combination.pdf'], '-transparent');
+
+%% Combining - Lorenzo
+sinapov = 51.3;
+Mbar = [MMod(3, 1); MCat(end); MSum; sinapov; MComb; MScoreBSi];
+figure('Position', [0, 0, 1920, 1080]);
+hb = bar(Mbar);
+set(hb(1),'FaceColor',[0 .4 .6]);
+set(gca,'fontsize',18)
+set(gca,'xticklabel', {'    Joints\newline(snapshot)', '  Concatenation', ....
+    ' Averaging', '        Average\newline   Sinapov et al.\newline         (2014)', ...
+    '    Hierarchical\newline    (multi-class)', '    Hierarchical\newline    (binary-sign)'});
+ylabel(titleAccuracy);
+export_fig([folderSave, 'combination_lorenzo.pdf'], '-transparent');
 
 %% Binary classifiers - all strategies
 figure('Position', [0, 0, 1920, 1080]);
