@@ -138,7 +138,7 @@ MTrialsCombEP = ResTrialsCombEP.M * 100;
 
 
 %% ********************************************************************* %%
-folderSave = '/home/bhigy/data/icub/haptic_data_20151028/pictures/IROS_2016/';
+folderSave = [home_folder, '/data/icub/haptic_data_20151028/figures/IROS_2016/'];
 
 labelAnalog = '  F/T\newline(raw)';
 labelSpringy = ' Hand\newlinesprings';
@@ -199,16 +199,20 @@ set(gca,'xticklabel', {'    Joints\newline(snapshot)', 'Concatenation', ....
 ylabel(titleAccuracy);
 export_fig([folderSave, 'combination.pdf'], '-transparent');
 
-%% Combining - Lorenzo
+%% Combining - Presentation
 sinapov = 51.3;
-Mbar = [MMod(3, 1); MCat(end); MSum; sinapov; MComb; MScoreBSi];
+Mbar = [MMod(3, 1); MCat(end); MSum; sinapov; MScoreBSi; HistAll(end,1)];
 figure('Position', [0, 0, 1920, 1080]);
-hb = bar(Mbar);
-set(hb(1),'FaceColor',[0 .4 .6]);
-set(gca,'fontsize',18)
-set(gca,'xticklabel', {'    Joints\newline(snapshot)', '  Concatenation', ....
-    ' Averaging', '        Average\newline   Sinapov et al.\newline         (2014)', ...
-    '    Hierarchical\newline    (multi-class)', '    Hierarchical\newline    (binary-sign)'});
+hb = bar(1:4, Mbar(1:4), 'FaceColor', [0.34 .65 .71]);
+hold on;
+hb = bar(5:6, Mbar(5:6), 'FaceColor', [.84 .62 .25]);
+hold off;
+set(gca,'xtick',1:numel(Mbar))
+set(gca,'fontsize',24)
+set(gca,'xticklabel', {'Joints', ' Concatenation', ' Averaging', ...
+    ' Sinapov et al.\newline      (2014)', ...
+    '  Hierarchical\newline     binary\newline (grasp only)', ...
+    '  Hierarchical\newline     binary\newline    (all EPs)'});
 ylabel(titleAccuracy);
 export_fig([folderSave, 'combination_lorenzo.pdf'], '-transparent');
 

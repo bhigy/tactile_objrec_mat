@@ -1,5 +1,4 @@
 % Main script controlling the overall pipeline
-conf;
 init;
 
 %% Parameters
@@ -16,7 +15,7 @@ do_analyse      = true;
 
 param = hd_init_params(enum.dataset, enum.dataset.HAPTIC3, home_folder);
 
-%% Data loading 
+%% Data loading
 if do_load
     disp('-- Loading data');
     [data, labels] = hd_load(param);
@@ -39,7 +38,7 @@ if do_analyse
     disp('-- Analysing data');
     load([param.root, param.filenames.XY]);
     nb_iter = 10;
-    
+
 %     disp('--- Condition-specific multi-class classifiers')
 %     [Ypred, Ytest, confidence] = hda_rls(X, Y, nb_iter, param.nb_items_test);
 %     save([param.root, 'matlab/hde_all_conditions.mat'], 'Ypred', 'Ytest', 'confidence', 'contexts');
@@ -67,7 +66,7 @@ if do_analyse
 %     disp('-- Trials combination');
 %     hde_combine_trials_modalities;
 %     save([param.root, 'matlab/hde_trials_combination.mat'], 'M');
-    
+
 %     [Ypred, Ytest, confidence] = hde_moments;
 %     hde_moments_res.Ypred = Ypred;
 %     hde_moments_res.Ytest = Ytest;
